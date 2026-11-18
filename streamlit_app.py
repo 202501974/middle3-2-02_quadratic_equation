@@ -55,13 +55,9 @@ components.html(
           position: relative; width: min(100%, 360px); aspect-ratio: 1;
           background-color: #fbfcff;
           background-image: linear-gradient(#e9edf5 1px, transparent 1px), linear-gradient(90deg, #e9edf5 1px, transparent 1px);
-          background-size: 20px 20px; border: 2px dashed #cbd4e4; border-radius: 12px;
+          background-size: 28px 28px; border: 2px dashed #cbd4e4; border-radius: 12px;
           touch-action: none; overflow: hidden;
         }
-        .board::before { content: ""; position: absolute; inset: 0 auto auto 0; width: 260px; height: 260px; border: 2px solid #8e9bb3; pointer-events: none; }
-        .axis-label { position: absolute; color: #8490a5; font-size: 11px; font-weight: 700; }
-        .axis-x { top: 266px; left: 102px; }
-        .axis-y { top: 113px; left: -7px; transform: rotate(-90deg); }
         .piece {
           position: absolute; display: grid; place-items: center; border: 2px solid #fff;
           border-radius: 8px; cursor: grab; user-select: none; touch-action: none;
@@ -71,18 +67,18 @@ components.html(
         .piece:active { cursor: grabbing; }
         .piece.selected { outline: 3px solid #293d72; outline-offset: 2px; z-index: 5; }
         .piece.dragging { opacity: .88; box-shadow: 0 8px 20px #34415d36; z-index: 10; }
-        .piece-x2 { width: 160px; height: 160px; background: #7d8df1; color: white; font-size: 24px; }
-        .piece-x-horizontal { width: 160px; height: 100px; background: #ffbf66; color: #653e08; font-size: 14px; }
-        .piece-x-vertical { width: 100px; height: 160px; background: #f0ad50; color: #653e08; font-size: 14px; }
-        .piece-square25 { width: 100px; height: 100px; background: #69c9ad; color: #155945; font-size: 16px; }
+        .piece-x2 { width: 112px; height: 112px; background: #7d8df1; color: white; font-size: 22px; }
+        .piece-x-horizontal { width: 140px; height: 112px; background: #ffbf66; color: #653e08; font-size: 14px; }
+        .piece-x-vertical { width: 112px; height: 140px; background: #f0ad50; color: #653e08; font-size: 14px; }
+        .piece-square25 { width: 140px; height: 140px; background: #69c9ad; color: #155945; font-size: 16px; }
         .tray { min-height: 150px; padding: 12px; border-radius: 12px; background: #f7f8fc; border: 1px solid #edf0f6; }
         .tray-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: #78849a; font-size: 12px; font-weight: 700; }
         .tray-pieces { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; min-height: 74px; }
         .tray .piece { position: relative; inset: auto !important; flex: 0 0 auto; }
-        .tray .piece-x2 { width: 64px; height: 64px; font-size: 17px; }
+        .tray .piece-x2 { width: 56px; height: 56px; font-size: 15px; }
         .tray .piece-x-horizontal { width: 100px; height: 50px; font-size: 12px; }
         .tray .piece-x-vertical { width: 50px; height: 100px; font-size: 12px; }
-        .tray .piece-square25 { width: 50px; height: 50px; font-size: 12px; }
+        .tray .piece-square25 { width: 70px; height: 70px; font-size: 14px; }
         .tray .piece.selected { outline-offset: 1px; }
         .tools { display: flex; gap: 8px; margin-top: 13px; }
         .btn { border: 1px solid #dfe5ef; background: white; color: #34425d; border-radius: 10px; padding: 9px 13px; font-size: 12px; font-weight: 700; cursor: pointer; transition: .15s; }
@@ -119,8 +115,6 @@ components.html(
           .layout { grid-template-columns: 1fr; }
           .board-card { padding: 15px; }
           .board { width: min(100%, 340px); }
-          .axis-x { top: 266px; left: 102px; }
-          .axis-y { top: 113px; }
           .tray { min-height: 150px; }
         }
         @media (max-width: 360px) {
@@ -146,8 +140,6 @@ components.html(
             </div>
             <div class="board-stage">
               <div class="board" id="board" aria-label="도형을 배치하는 격자">
-                <span class="axis-label axis-x">x + 5</span>
-                <span class="axis-label axis-y">x + 5</span>
               </div>
             </div>
             <div class="tray">
@@ -172,8 +164,8 @@ components.html(
               <div class="expression empty" id="expression" aria-live="polite">아직 배치한 도형이 없어요</div>
               <div class="formula-divider"></div>
               <div class="equation-label">완성제곱식으로 바꾸기</div>
-              <div class="expression result" id="equationStep">x² + 10x + □ = 24 + □</div>
-              <div class="expression result" id="factorized">(x + 5)² = 49</div>
+              <div class="expression result" id="equationStep">퍼즐을 완성하면 식이 나타나요</div>
+              <div class="expression result" id="factorized"></div>
               <div class="progress-wrap">
                 <div class="progress-info"><span>퍼즐 완성도</span><span id="progressText">0 / 4 조각</span></div>
                 <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
@@ -198,7 +190,7 @@ components.html(
           const completeMessage = document.getElementById("completeMessage");
           const equationStep = document.getElementById("equationStep");
           const factorized = document.getElementById("factorized");
-          const unit = 20;
+          const unit = 28;
           const pieces = [];
           let selected = null;
           let drag = null;
@@ -225,16 +217,16 @@ components.html(
           function cellsFor(piece, x, y) {
             const cells = [];
             if (piece.type === "x2") {
-              for (let row = 0; row < 8; row++) {
-                for (let col = 0; col < 8; col++) cells.push(`${x + col * unit},${y + row * unit}`);
+              for (let row = 0; row < 4; row++) {
+                for (let col = 0; col < 4; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
             } else if (piece.type === "x-horizontal") {
-              for (let row = 0; row < 5; row++) {
-                for (let col = 0; col < 8; col++) cells.push(`${x + col * unit},${y + row * unit}`);
+              for (let row = 0; row < 4; row++) {
+                for (let col = 0; col < 5; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
             } else if (piece.type === "x-vertical") {
-              for (let row = 0; row < 8; row++) {
-                for (let col = 0; col < 5; col++) cells.push(`${x + col * unit},${y + row * unit}`);
+              for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 4; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
             } else if (piece.type === "square25") {
               for (let row = 0; row < 5; row++) {
@@ -245,15 +237,15 @@ components.html(
           }
 
           function dimensions(piece) {
-            if (piece.type === "x2") return { width: 8 * unit, height: 8 * unit };
-            if (piece.type === "x-horizontal") return { width: 8 * unit, height: 5 * unit };
-            if (piece.type === "x-vertical") return { width: 5 * unit, height: 8 * unit };
+            if (piece.type === "x2") return { width: 4 * unit, height: 4 * unit };
+            if (piece.type === "x-horizontal") return { width: 5 * unit, height: 4 * unit };
+            if (piece.type === "x-vertical") return { width: 4 * unit, height: 5 * unit };
             return { width: 5 * unit, height: 5 * unit };
           }
 
           function validPlacement(piece, x, y) {
             const { width, height } = dimensions(piece);
-            if (x < 0 || y < 0 || x + width > 13 * unit || y + height > 13 * unit) return false;
+            if (x < 0 || y < 0 || x + width > 12 * unit || y + height > 12 * unit) return false;
             const occupied = new Set();
             for (const other of pieces) {
               if (other === piece || !other.placed) continue;
@@ -275,17 +267,6 @@ components.html(
           }
 
           function updateEquation() {
-            const x2Placed = pieces.some(piece => piece.type === "x2" && piece.placed);
-            const rectangleCount = pieces.filter(piece => piece.type.startsWith("x-") && piece.placed).length;
-            const square25Placed = pieces.some(piece => piece.type === "square25" && piece.placed);
-            const terms = [];
-            if (x2Placed) terms.push('<span class="term-x2">x²</span>');
-            const xCoefficient = rectangleCount * 5;
-            if (xCoefficient) terms.push(`<span class="term-x">${xCoefficient === 1 ? "" : xCoefficient}x</span>`);
-            if (square25Placed) terms.push('<span class="term-unit">25</span>');
-            expression.innerHTML = terms.length ? terms.join(" + ") : "아직 배치한 도형이 없어요";
-            expression.classList.toggle("empty", terms.length === 0);
-
             const placedCount = pieces.filter(piece => piece.placed).length;
             progressText.textContent = `${placedCount} / 4 조각`;
             progressBar.style.width = `${(placedCount / 4) * 100}%`;
@@ -296,11 +277,21 @@ components.html(
                 for (const cell of cellsFor(piece, piece.x, piece.y)) filled.add(cell);
               }
             }
-            const complete = x2Placed && rectangleCount === 2 && square25Placed && filled.size === 169;
-            statusBadge.textContent = complete ? "완성했어요!" : `${placedCount}개 배치`;
+            const coordinates = [...filled].map(cell => cell.split(",").map(Number));
+            const minX = Math.min(...coordinates.map(([x]) => x));
+            const maxX = Math.max(...coordinates.map(([x]) => x));
+            const minY = Math.min(...coordinates.map(([, y]) => y));
+            const maxY = Math.max(...coordinates.map(([, y]) => y));
+            const complete = placedCount === 4
+              && filled.size === 81
+              && maxX - minX === 8 * unit
+              && maxY - minY === 8 * unit;
+            statusBadge.textContent = complete ? "정사각형 완성!" : `${placedCount} / 4 조각 배치`;
+            expression.textContent = complete ? "x² + 10x + 25" : "모든 조각을 붙여 큰 정사각형을 만들어 보세요";
+            expression.classList.toggle("empty", !complete);
             completeMessage.classList.toggle("show", complete);
-            equationStep.textContent = complete ? "x² + 10x + 25 = 24 + 25" : "x² + 10x + □ = 24 + □";
-            factorized.textContent = complete ? "(x + 5)² = 49" : "빈 모서리를 채우면 완성돼요";
+            equationStep.textContent = complete ? "x² + 10x + 25 = 24 + 25" : "모든 조각이 서로 붙으면 등식이 완성돼요";
+            factorized.textContent = complete ? "(x + 5)² = 49" : "";
           }
 
           function startDrag(event, piece) {
