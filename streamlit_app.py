@@ -129,7 +129,7 @@ components.html(
         <p class="intro">도형을 옮겨 큰 정사각형을 만들어 보세요. 조각을 놓을 때마다 넓이의 식이 바뀝니다.</p>
         <section class="problem-card" aria-label="오늘의 문제">
           <div><div class="problem-label">오늘의 문제</div><div class="problem-expression">x² + 10x = 24</div></div>
-          <div class="problem-hint">빈 모서리를 단위 정사각형으로 채워 완전제곱식을 만들어 보세요.</div>
+          <div class="problem-hint">빈 모서리를 넓이가 25인 정사각형으로 채워 완전제곱식을 만들어 보세요.</div>
         </section>
 
         <div class="layout">
@@ -271,6 +271,18 @@ components.html(
             progressText.textContent = `${placedCount} / 4 조각`;
             progressBar.style.width = `${(placedCount / 4) * 100}%`;
 
+            const x2Placed = pieces.some(piece => piece.type === "x2" && piece.placed);
+            const rectangleCount = pieces.filter(piece => piece.type.startsWith("x-") && piece.placed).length;
+            const square25Placed = pieces.some(piece => piece.type === "square25" && piece.placed);
+            const terms = [];
+            if (x2Placed) terms.push('<span class="term-x2">x²</span>');
+            if (rectangleCount) terms.push(`<span class="term-x">${rectangleCount * 5}x</span>`);
+            if (square25Placed) terms.push('<span class="term-unit">25</span>');
+            let areaSum = terms.join(" + ");
+            if (x2Placed && rectangleCount === 2 && !square25Placed) areaSum += " = 24";
+            expression.innerHTML = areaSum || "아직 도형을 배치하지 않았어요";
+            expression.classList.toggle("empty", !areaSum);
+
             const filled = new Set();
             for (const piece of pieces) {
               if (piece.placed) {
@@ -278,14 +290,12 @@ components.html(
               }
             }
             const coordinates = [...filled].map(cell => cell.split(",").map(Number));
-            const minX = Math.min(...coordinates.map(([x]) => x));
-            const maxX = Math.max(...coordinates.map(([x]) => x));
-            const minY = Math.min(...coordinates.map(([, y]) => y));
-            const maxY = Math.max(...coordinates.map(([, y]) => y));
-            const complete = placedCount === 4
+            const isSquareArrangement = coordinates.length > 0
+              && Math.max(...coordinates.map(([x]) => x)) - Math.min(...coordinates.map(([x]) => x)) === 8 * unit
+              && Math.max(...coordinates.map(([, y]) => y)) - Math.min(...coordinates.map(([, y]) => y)) === 8 * unit;
+            const complete = x2Placed && rectangleCount === 2 && square25Placed
               && filled.size === 81
-              && maxX - minX === 8 * unit
-              && maxY - minY === 8 * unit;
+              && isSquareArrangement;
             statusBadge.textContent = complete ? "정사각형 완성!" : `${placedCount} / 4 조각 배치`;
             expression.textContent = complete ? "x² + 10x + 25" : "모든 조각을 붙여 큰 정사각형을 만들어 보세요";
             expression.classList.toggle("empty", !complete);
