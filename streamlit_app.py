@@ -297,8 +297,6 @@ components.html(
               && filled.size === 81
               && isSquareArrangement;
             statusBadge.textContent = complete ? "정사각형 완성!" : `${placedCount} / 4 조각 배치`;
-            expression.textContent = complete ? "x² + 10x + 25" : "모든 조각을 붙여 큰 정사각형을 만들어 보세요";
-            expression.classList.toggle("empty", !complete);
             completeMessage.classList.toggle("show", complete);
             equationStep.textContent = complete ? "x² + 10x + 25 = 24 + 25" : "모든 조각이 서로 붙으면 등식이 완성돼요";
             factorized.textContent = complete ? "(x + 5)² = 49" : "";
