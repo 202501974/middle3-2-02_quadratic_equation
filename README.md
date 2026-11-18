@@ -1,25 +1,14 @@
-# 🎈 Blank app template
+# 완전제곱식 퍼즐
 
-A simple Streamlit app template for you to modify!
+중학교 3학년 학생이 넓이 모델로 완전제곱식의 구조를 탐구하는 Streamlit 교육 앱입니다. 화면의 `x²` 타일에 `x` 직사각형 6개와 단위 정사각형 9개를 붙여 한 변이 `x + 3`인 정사각형을 완성합니다. 조각을 배치할 때마다 현재 넓이의 합이 표시되고, 직사각형은 회전할 수 있습니다.
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
+## 실행 방법
 
-### How to run it on your own machine
-
-Prerequisite: install `uv` if you don't already have it.
+먼저 `uv`를 설치한 뒤 저장소 루트에서 다음 명령을 실행합니다.
 
 ```
-$ curl -LsSf https://astral.sh/uv/install.sh | sh
+uv sync
+uv run streamlit run streamlit_app.py
 ```
 
-1. Sync the dependencies
-
-   ```
-   $ uv sync
-   ```
-
-2. Run the app
-
-   ```
-   $ uv run streamlit run streamlit_app.py
-   ```
+조각을 드래그해 격자에 놓고, 직사각형 선택 후 **선택한 조각 회전** 버튼(또는 `R` 키)을 사용하세요. **다시 시작**을 눌러 활동을 초기화할 수 있습니다.
