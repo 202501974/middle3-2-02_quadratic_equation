@@ -58,10 +58,10 @@ components.html(
           background-size: 20px 20px; border: 2px dashed #cbd4e4; border-radius: 12px;
           touch-action: none; overflow: hidden;
         }
-        .board::before { content: ""; position: absolute; inset: 0 auto auto 0; width: 300px; height: 300px; border: 2px solid #8e9bb3; pointer-events: none; }
+        .board::before { content: ""; position: absolute; inset: 0 auto auto 0; width: 260px; height: 260px; border: 2px solid #8e9bb3; pointer-events: none; }
         .axis-label { position: absolute; color: #8490a5; font-size: 11px; font-weight: 700; }
-        .axis-x { top: 306px; left: 122px; }
-        .axis-y { top: 133px; left: -7px; transform: rotate(-90deg); }
+        .axis-x { top: 266px; left: 102px; }
+        .axis-y { top: 113px; left: -7px; transform: rotate(-90deg); }
         .piece {
           position: absolute; display: grid; place-items: center; border: 2px solid #fff;
           border-radius: 8px; cursor: grab; user-select: none; touch-action: none;
@@ -71,24 +71,24 @@ components.html(
         .piece:active { cursor: grabbing; }
         .piece.selected { outline: 3px solid #293d72; outline-offset: 2px; z-index: 5; }
         .piece.dragging { opacity: .88; box-shadow: 0 8px 20px #34415d36; z-index: 10; }
-        .piece-x2 { width: 200px; height: 200px; background: #7d8df1; color: white; font-size: 26px; }
-        .piece-x { width: 200px; height: 100px; background: #ffbf66; color: #653e08; font-size: 14px; }
-        .piece-unit { width: 20px; height: 20px; background: #69c9ad; color: #155945; font-size: 9px; border-radius: 5px; }
+        .piece-x2 { width: 160px; height: 160px; background: #7d8df1; color: white; font-size: 24px; }
+        .piece-x-horizontal { width: 160px; height: 100px; background: #ffbf66; color: #653e08; font-size: 14px; }
+        .piece-x-vertical { width: 100px; height: 160px; background: #f0ad50; color: #653e08; font-size: 14px; }
+        .piece-square25 { width: 100px; height: 100px; background: #69c9ad; color: #155945; font-size: 16px; }
         .tray { min-height: 150px; padding: 12px; border-radius: 12px; background: #f7f8fc; border: 1px solid #edf0f6; }
         .tray-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: #78849a; font-size: 12px; font-weight: 700; }
         .tray-pieces { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; min-height: 74px; }
         .tray .piece { position: relative; inset: auto !important; flex: 0 0 auto; }
-        .tray .piece-x2 { width: 72px; height: 72px; font-size: 19px; }
-        .tray .piece-x { width: 100px; height: 50px; font-size: 12px; }
-        .tray .piece-unit { width: 20px; height: 20px; }
+        .tray .piece-x2 { width: 64px; height: 64px; font-size: 17px; }
+        .tray .piece-x-horizontal { width: 100px; height: 50px; font-size: 12px; }
+        .tray .piece-x-vertical { width: 50px; height: 100px; font-size: 12px; }
+        .tray .piece-square25 { width: 50px; height: 50px; font-size: 12px; }
         .tray .piece.selected { outline-offset: 1px; }
-        .board .piece.x-vertical { width: 100px; height: 200px; }
         .tools { display: flex; gap: 8px; margin-top: 13px; }
         .btn { border: 1px solid #dfe5ef; background: white; color: #34425d; border-radius: 10px; padding: 9px 13px; font-size: 12px; font-weight: 700; cursor: pointer; transition: .15s; }
         .btn:hover { background: #f5f7fc; border-color: #bfc9dc; }
         .btn.primary { color: white; border-color: #4e61d3; background: #586be0; }
         .btn.primary:hover { background: #495dcf; }
-        .btn:disabled { opacity: .45; cursor: not-allowed; }
         .side { display: flex; flex-direction: column; gap: 14px; }
         .lesson-card, .equation-card, .goal-card { padding: 19px; }
         .step { display: flex; gap: 12px; align-items: flex-start; margin-top: 15px; }
@@ -119,8 +119,8 @@ components.html(
           .layout { grid-template-columns: 1fr; }
           .board-card { padding: 15px; }
           .board { width: min(100%, 340px); }
-          .axis-x { top: 306px; left: 122px; }
-          .axis-y { top: 133px; }
+          .axis-x { top: 266px; left: 102px; }
+          .axis-y { top: 113px; }
           .tray { min-height: 150px; }
         }
         @media (max-width: 360px) {
@@ -141,7 +141,7 @@ components.html(
         <div class="layout">
           <section class="card board-card">
             <div class="section-head">
-              <div><h2>큰 정사각형 만들기</h2><p class="hint">보관함의 모든 조각을 판에 끌어 놓으세요. 직사각형은 회전할 수 있어요.</p></div>
+              <div><h2>큰 정사각형 만들기</h2><p class="hint">보관함의 네 조각을 판에 끌어 놓아 빈틈없이 채워 보세요.</p></div>
               <span class="badge" id="statusBadge">시작해 볼까요?</span>
             </div>
             <div class="board-stage">
@@ -151,11 +151,10 @@ components.html(
               </div>
             </div>
             <div class="tray">
-              <div class="tray-title"><span>도형 조각</span><span>x² 1개 · 5x 직사각형 2개 · 1 정사각형 25개</span></div>
+              <div class="tray-title"><span>도형 조각</span><span>x² 1개 · 5x 가로/세로 각 1개 · 25 정사각형 1개</span></div>
               <div class="tray-pieces" id="tray"></div>
             </div>
             <div class="tools">
-              <button class="btn" id="rotateBtn" type="button" disabled>↻ 선택한 조각 회전</button>
               <button class="btn" id="resetBtn" type="button">다시 시작</button>
             </div>
           </section>
@@ -163,9 +162,9 @@ components.html(
           <aside class="side">
             <section class="card lesson-card">
               <h2>활동 방법</h2>
-              <div class="step"><span class="step-num">1</span><p>큰 정사각형의 왼쪽 위에 있는 <b>x²</b> 타일을 살펴보세요.</p></div>
-              <div class="step"><span class="step-num">2</span><p><b>5x</b> 직사각형 두 개를 x² 타일의 두 변에 붙여 보세요.</p></div>
-              <div class="step"><span class="step-num">3</span><p>남은 <b>5 × 5</b> 모서리를 단위 정사각형 25개로 채워 보세요.</p></div>
+              <div class="step"><span class="step-num">1</span><p><b>x²</b> 타일을 큰 정사각형의 한쪽 모서리에 놓으세요.</p></div>
+              <div class="step"><span class="step-num">2</span><p><b>가로 5x</b>와 <b>세로 5x</b> 조각을 x² 타일의 두 변에 붙여 보세요.</p></div>
+              <div class="step"><span class="step-num">3</span><p>남은 <b>5 × 5</b> 모서리를 <b>25</b> 정사각형으로 채워 보세요.</p></div>
             </section>
             <section class="card equation-card">
               <h2>도형의 넓이 식</h2>
@@ -176,7 +175,7 @@ components.html(
               <div class="expression result" id="equationStep">x² + 10x + □ = 24 + □</div>
               <div class="expression result" id="factorized">(x + 5)² = 49</div>
               <div class="progress-wrap">
-                <div class="progress-info"><span>퍼즐 완성도</span><span id="progressText">0 / 28 조각</span></div>
+                <div class="progress-info"><span>퍼즐 완성도</span><span id="progressText">0 / 4 조각</span></div>
                 <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
               </div>
             </section>
@@ -193,10 +192,8 @@ components.html(
           const board = document.getElementById("board");
           const tray = document.getElementById("tray");
           const expression = document.getElementById("expression");
-          const result = document.getElementById("result");
           const progressText = document.getElementById("progressText");
           const progressBar = document.getElementById("progressBar");
-          const rotateBtn = document.getElementById("rotateBtn");
           const statusBadge = document.getElementById("statusBadge");
           const completeMessage = document.getElementById("completeMessage");
           const equationStep = document.getElementById("equationStep");
@@ -206,92 +203,92 @@ components.html(
           let selected = null;
           let drag = null;
 
-          function createPiece(type, id) {
+          function createPiece(type, id, label, description) {
             const piece = document.createElement("div");
             piece.className = `piece piece-${type}`;
             piece.dataset.type = type;
             piece.dataset.id = id;
-            piece.textContent = type === "x2" ? "x²" : type === "x" ? "5x" : "1";
+            piece.textContent = label;
             piece.setAttribute("role", "button");
-            piece.setAttribute("aria-label", type === "x2" ? "x 제곱 타일" : type === "x" ? "5x 직사각형 조각" : "1 정사각형 조각");
+            piece.setAttribute("aria-label", description);
             piece.tabIndex = 0;
             tray.appendChild(piece);
-            pieces.push({ el: piece, type, id, placed: false, x: 0, y: 0, vertical: false });
+            pieces.push({ el: piece, type, id, placed: false, x: 0, y: 0 });
             return piece;
           }
 
-          createPiece("x2", "x2");
-          for (let i = 0; i < 2; i++) createPiece("x", `x-${i}`);
-          for (let i = 0; i < 25; i++) createPiece("unit", `unit-${i}`);
+          createPiece("x2", "x2", "x²", "x 제곱 정사각형");
+          createPiece("x-horizontal", "x-horizontal", "5x", "가로로 긴 5x 직사각형");
+          createPiece("x-vertical", "x-vertical", "5x", "세로로 긴 5x 직사각형");
+          createPiece("square25", "square25", "25", "넓이가 25인 정사각형");
 
-          function cellsFor(piece, x, y, vertical = piece.vertical) {
-            if (piece.type === "unit") return [`${x},${y}`];
+          function cellsFor(piece, x, y) {
             const cells = [];
             if (piece.type === "x2") {
-              for (let row = 0; row < 10; row++) {
-                for (let col = 0; col < 10; col++) cells.push(`${x + col * unit},${y + row * unit}`);
+              for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
-            } else if (vertical) {
-              for (let row = 0; row < 10; row++) {
+            } else if (piece.type === "x-horizontal") {
+              for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 8; col++) cells.push(`${x + col * unit},${y + row * unit}`);
+              }
+            } else if (piece.type === "x-vertical") {
+              for (let row = 0; row < 8; row++) {
                 for (let col = 0; col < 5; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
-            } else {
+            } else if (piece.type === "square25") {
               for (let row = 0; row < 5; row++) {
-                for (let col = 0; col < 10; col++) cells.push(`${x + col * unit},${y + row * unit}`);
+                for (let col = 0; col < 5; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
             }
             return cells;
           }
 
-          function dimensions(piece, vertical = piece.vertical) {
-            if (piece.type === "x2") return { width: 10 * unit, height: 10 * unit };
-            if (piece.type === "unit") return { width: unit, height: unit };
-            if (vertical) return { width: 5 * unit, height: 10 * unit };
-            return { width: 10 * unit, height: 5 * unit };
+          function dimensions(piece) {
+            if (piece.type === "x2") return { width: 8 * unit, height: 8 * unit };
+            if (piece.type === "x-horizontal") return { width: 8 * unit, height: 5 * unit };
+            if (piece.type === "x-vertical") return { width: 5 * unit, height: 8 * unit };
+            return { width: 5 * unit, height: 5 * unit };
           }
 
-          function validPlacement(piece, x, y, vertical = piece.vertical) {
-            const { width, height } = dimensions(piece, vertical);
-            if (x < 0 || y < 0 || x + width > 15 * unit || y + height > 15 * unit) return false;
+          function validPlacement(piece, x, y) {
+            const { width, height } = dimensions(piece);
+            if (x < 0 || y < 0 || x + width > 13 * unit || y + height > 13 * unit) return false;
             const occupied = new Set();
             for (const other of pieces) {
               if (other === piece || !other.placed) continue;
               for (const cell of cellsFor(other, other.x, other.y)) occupied.add(cell);
             }
-            return cellsFor(piece, x, y, vertical).every(cell => !occupied.has(cell));
+            return cellsFor(piece, x, y).every(cell => !occupied.has(cell));
           }
 
           function setPosition(piece, x, y) {
             piece.el.style.left = `${x}px`;
             piece.el.style.top = `${y}px`;
             piece.el.style.position = "absolute";
-            if (piece.type === "x") {
-              piece.el.classList.toggle("x-vertical", piece.vertical);
-            }
           }
 
           function choose(piece) {
             if (selected) selected.el.classList.remove("selected");
             selected = piece;
             if (selected) selected.el.classList.add("selected");
-            rotateBtn.disabled = !selected || selected.type !== "x";
           }
 
           function updateEquation() {
             const x2Placed = pieces.some(piece => piece.type === "x2" && piece.placed);
-            const rectangleCount = pieces.filter(piece => piece.type === "x" && piece.placed).length;
-            const unitCount = pieces.filter(piece => piece.type === "unit" && piece.placed).length;
+            const rectangleCount = pieces.filter(piece => piece.type.startsWith("x-") && piece.placed).length;
+            const square25Placed = pieces.some(piece => piece.type === "square25" && piece.placed);
             const terms = [];
             if (x2Placed) terms.push('<span class="term-x2">x²</span>');
             const xCoefficient = rectangleCount * 5;
             if (xCoefficient) terms.push(`<span class="term-x">${xCoefficient === 1 ? "" : xCoefficient}x</span>`);
-            if (unitCount) terms.push(`<span class="term-unit">${unitCount}</span>`);
+            if (square25Placed) terms.push('<span class="term-unit">25</span>');
             expression.innerHTML = terms.length ? terms.join(" + ") : "아직 배치한 도형이 없어요";
             expression.classList.toggle("empty", terms.length === 0);
 
             const placedCount = pieces.filter(piece => piece.placed).length;
-            progressText.textContent = `${placedCount} / 28 조각`;
-            progressBar.style.width = `${(placedCount / 28) * 100}%`;
+            progressText.textContent = `${placedCount} / 4 조각`;
+            progressBar.style.width = `${(placedCount / 4) * 100}%`;
 
             const filled = new Set();
             for (const piece of pieces) {
@@ -299,7 +296,7 @@ components.html(
                 for (const cell of cellsFor(piece, piece.x, piece.y)) filled.add(cell);
               }
             }
-            const complete = x2Placed && rectangleCount === 2 && unitCount === 25 && filled.size === 225;
+            const complete = x2Placed && rectangleCount === 2 && square25Placed && filled.size === 169;
             statusBadge.textContent = complete ? "완성했어요!" : `${placedCount}개 배치`;
             completeMessage.classList.toggle("show", complete);
             equationStep.textContent = complete ? "x² + 10x + 25 = 24 + 25" : "x² + 10x + □ = 24 + □";
@@ -380,33 +377,10 @@ components.html(
           document.addEventListener("pointerup", endDrag);
           document.addEventListener("pointercancel", endDrag);
 
-          function rotateSelected() {
-            if (!selected || selected.type !== "x") return;
-            const nextVertical = !selected.vertical;
-            if (selected.placed && !validPlacement(selected, selected.x, selected.y, nextVertical)) {
-              statusBadge.textContent = "그 자리는 회전할 수 없어요";
-              return;
-            }
-            selected.vertical = nextVertical;
-            if (selected.placed) setPosition(selected, selected.x, selected.y);
-            else {
-              selected.el.classList.toggle("x-vertical", nextVertical);
-              selected.el.style.width = nextVertical ? "50px" : "100px";
-              selected.el.style.height = nextVertical ? "100px" : "50px";
-            }
-            statusBadge.textContent = "조각을 회전했어요";
-          }
-
-          rotateBtn.addEventListener("click", rotateSelected);
-          document.addEventListener("keydown", event => {
-            if (event.key === "r" || event.key === "R") rotateSelected();
-          });
-
           document.getElementById("resetBtn").addEventListener("click", () => {
             for (const piece of pieces) {
               piece.placed = false;
-              piece.vertical = false;
-              piece.el.classList.remove("x-vertical", "selected", "dragging");
+              piece.el.classList.remove("selected", "dragging");
               piece.el.style.cssText = "";
               tray.appendChild(piece.el);
             }
