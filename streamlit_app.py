@@ -301,6 +301,11 @@ components.html(
                 term: `${side * side}`
               });
             }
+            for (let index = pieces.length - 1; index > 0; index--) {
+              const randomIndex = Math.floor(Math.random() * (index + 1));
+              [pieces[index], pieces[randomIndex]] = [pieces[randomIndex], pieces[index]];
+            }
+            for (const piece of pieces) tray.appendChild(piece.el);
             problemExpression.textContent = `x² + ${2 * a}x = ${problem.rightSide}`;
             problemLabel.textContent = problemIndex === 0 ? "오늘의 문제" : `도전 문제 ${problemIndex} / ${problems.length - 1}`;
             processHint.textContent = `x² + ${2 * a}x = ${problem.rightSide}`;
