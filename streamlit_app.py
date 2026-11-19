@@ -414,14 +414,25 @@ components.html(
             const x2Placed = pieces.some(piece => piece.required && piece.type === "x2" && piece.placed);
             const rectangleCount = pieces.filter(piece => piece.required && piece.type.startsWith("x-") && piece.placed).length;
             const squarePlaced = pieces.some(piece => piece.required && piece.type === "square" && piece.placed);
-            const distractorAreas = pieces
+            const distractorPieces = pieces
               .filter(piece => !piece.required && piece.placed)
-              .map(piece => piece.term);
+            const distractorAreas = distractorPieces.map(piece => piece.term);
+            const distractorX = distractorPieces.reduce((sum, piece) =>
+              sum + (piece.term.endsWith("x") ? Number.parseInt(piece.term, 10) : 0), 0);
+            const distractorConstant = distractorPieces.reduce((sum, piece) =>
+              sum + (piece.term.endsWith("x") ? 0 : Number(piece.term)), 0);
             const terms = [];
             if (x2Placed) terms.push('<span class="term-x2">x²</span>');
-            if (rectangleCount) terms.push(`<span class="term-x">${rectangleCount * problem.coefficient}x</span>`);
-            if (squarePlaced) terms.push(`<span class="term-unit">${problem.coefficient ** 2}</span>`);
-            for (const area of distractorAreas) terms.push(`<span class="term-distractor">${area}</span>`);
+            const xCoefficient = rectangleCount * problem.coefficient + distractorX;
+            if (xCoefficient) {
+              const termClass = distractorX ? "term-distractor" : "term-x";
+              terms.push(`<span class="${termClass}">${xCoefficient}x</span>`);
+            }
+            const constant = (squarePlaced ? problem.coefficient ** 2 : 0) + distractorConstant;
+            if (constant) {
+              const termClass = distractorConstant ? "term-distractor" : "term-unit";
+              terms.push(`<span class="${termClass}">${constant}</span>`);
+            }
             let areaSum = terms.join(" + ");
 
             const filled = new Set();
@@ -444,7 +455,7 @@ components.html(
             expression.innerHTML = areaSum || "아직 도형을 배치하지 않았어요";
             expression.classList.toggle("empty", !areaSum);
 
-            trayFeedback.textContent = distractorPlaced ? "오답 조각은 필요한 빈칸의 크기와 맞지 않아요. 보관함으로 옮겨 주세요." : "";
+            trayFeedback.textContent = distractorPlaced ? "방정식을 다시 한번 확인해 주세요." : "";
             revealBtn.disabled = !complete;
             if (!complete) {
               areaSumPanel.hidden = false;
@@ -543,7 +554,7 @@ components.html(
             }
             drag = null;
             updateEquation();
-            if (rejectedDistractor) trayFeedback.textContent = "이 오답 조각은 빈칸의 크기와 맞지 않아요.";
+            if (rejectedDistractor) trayFeedback.textContent = "방정식을 다시 한번 확인해 주세요.";
           }
 
           document.addEventListener("pointerdown", event => {
