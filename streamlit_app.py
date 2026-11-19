@@ -61,7 +61,7 @@ components.html(
         .piece {
           position: absolute; display: grid; place-items: center; border: 2px solid #fff;
           border-radius: 8px; cursor: grab; user-select: none; touch-action: none;
-          box-shadow: none; transition: filter .12s;
+          box-shadow: none; transition: left .07s linear, top .07s linear, filter .12s;
           z-index: 2; font-weight: 800;
         }
         .piece:active { cursor: grabbing; }
@@ -70,10 +70,6 @@ components.html(
         .piece-x2 { width: 84px; height: 84px; background: #7d8df1; color: white; font-size: 20px; }
         .piece-x-horizontal { width: 140px; height: 84px; background: #ffbf66; color: #653e08; font-size: 14px; }
         .piece-x-vertical { width: 84px; height: 140px; background: #f0ad50; color: #653e08; font-size: 14px; }
-        .piece-x4-horizontal { width: 112px; height: 84px; background: #f2a979; color: #663b22; font-size: 13px; }
-        .piece-x4-vertical { width: 84px; height: 112px; background: #e89a70; color: #663b22; font-size: 13px; }
-        .piece-x6-horizontal { width: 168px; height: 84px; background: #e58b82; color: #642f2a; font-size: 13px; }
-        .piece-x6-vertical { width: 84px; height: 168px; background: #d97770; color: #642f2a; font-size: 13px; }
         .piece-square25 { width: 140px; height: 140px; background: #69c9ad; color: #155945; font-size: 16px; }
         .piece-square16 { width: 112px; height: 112px; background: #ec9b9b; color: #6a3030; font-size: 16px; }
         .piece-square36 { width: 168px; height: 168px; background: #d7a3d8; color: #563458; font-size: 16px; }
@@ -84,10 +80,6 @@ components.html(
         .tray .piece-x2 { width: 42px; height: 42px; font-size: 13px; }
         .tray .piece-x-horizontal { width: 70px; height: 42px; font-size: 11px; }
         .tray .piece-x-vertical { width: 42px; height: 70px; font-size: 11px; }
-        .tray .piece-x4-horizontal { width: 56px; height: 42px; font-size: 10px; }
-        .tray .piece-x4-vertical { width: 42px; height: 56px; font-size: 10px; }
-        .tray .piece-x6-horizontal { width: 84px; height: 42px; font-size: 10px; }
-        .tray .piece-x6-vertical { width: 42px; height: 84px; font-size: 10px; }
         .tray .piece-square25 { width: 70px; height: 70px; font-size: 14px; }
         .tray .piece-square16 { width: 56px; height: 56px; font-size: 12px; }
         .tray .piece-square36 { width: 84px; height: 84px; font-size: 12px; }
@@ -164,7 +156,7 @@ components.html(
               </div>
             </div>
             <div class="tray">
-              <div class="tray-title"><span>도형 조각</span><span>필수: x² · 5x 가로/세로 · 25 / 오답: 4x·6x 가로/세로, 16·36</span></div>
+              <div class="tray-title"><span>도형 조각</span><span>필수: x² · 5x 가로/세로 · 25 / 오답: 16, 36</span></div>
               <div class="tray-pieces" id="tray"></div>
               <p class="tray-feedback" id="trayFeedback" aria-live="polite"></p>
             </div>
@@ -256,12 +248,6 @@ components.html(
           createPiece("x-horizontal", "x-horizontal", "5x", "가로로 긴 5x 직사각형");
           createPiece("x-vertical", "x-vertical", "5x", "세로로 긴 5x 직사각형");
           createPiece("square25", "square25", "25", "넓이가 25인 정사각형");
-          for (let i = 0; i < 2; i++) {
-            createPiece("x4-horizontal", `x4-h-${i}`, "4x", "가로로 긴 4x 오답 직사각형", false);
-            createPiece("x4-vertical", `x4-v-${i}`, "4x", "세로로 긴 4x 오답 직사각형", false);
-            createPiece("x6-horizontal", `x6-h-${i}`, "6x", "가로로 긴 6x 오답 직사각형", false);
-            createPiece("x6-vertical", `x6-v-${i}`, "6x", "세로로 긴 6x 오답 직사각형", false);
-          }
           createPiece("square16", "square16", "16", "넓이가 16인 오답 정사각형", false);
           createPiece("square36", "square36", "36", "넓이가 36인 오답 정사각형", false);
 
@@ -279,22 +265,6 @@ components.html(
               for (let row = 0; row < 5; row++) {
                 for (let col = 0; col < 3; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
-            } else if (piece.type === "x4-horizontal") {
-              for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 4; col++) cells.push(`${x + col * unit},${y + row * unit}`);
-              }
-            } else if (piece.type === "x4-vertical") {
-              for (let row = 0; row < 4; row++) {
-                for (let col = 0; col < 3; col++) cells.push(`${x + col * unit},${y + row * unit}`);
-              }
-            } else if (piece.type === "x6-horizontal") {
-              for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 6; col++) cells.push(`${x + col * unit},${y + row * unit}`);
-              }
-            } else if (piece.type === "x6-vertical") {
-              for (let row = 0; row < 6; row++) {
-                for (let col = 0; col < 3; col++) cells.push(`${x + col * unit},${y + row * unit}`);
-              }
             } else {
               const side = piece.type === "square16" ? 4 : piece.type === "square36" ? 6 : 5;
               for (let row = 0; row < side; row++) {
@@ -308,10 +278,6 @@ components.html(
             if (piece.type === "x2") return { width: 3 * unit, height: 3 * unit };
             if (piece.type === "x-horizontal") return { width: 5 * unit, height: 3 * unit };
             if (piece.type === "x-vertical") return { width: 3 * unit, height: 5 * unit };
-            if (piece.type === "x4-horizontal") return { width: 4 * unit, height: 3 * unit };
-            if (piece.type === "x4-vertical") return { width: 3 * unit, height: 4 * unit };
-            if (piece.type === "x6-horizontal") return { width: 6 * unit, height: 3 * unit };
-            if (piece.type === "x6-vertical") return { width: 3 * unit, height: 6 * unit };
             const side = piece.type === "square16" ? 4 : piece.type === "square36" ? 6 : 5;
             return { width: side * unit, height: side * unit };
           }
@@ -339,10 +305,6 @@ components.html(
             const distractorAreas = pieces
               .filter(piece => !piece.required && piece.placed)
               .map(piece => ({
-                "x4-horizontal": 12,
-                "x4-vertical": 12,
-                "x6-horizontal": 18,
-                "x6-vertical": 18,
                 square16: 16,
                 square36: 36
               }[piece.type]));
