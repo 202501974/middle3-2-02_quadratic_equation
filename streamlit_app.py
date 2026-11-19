@@ -197,7 +197,7 @@ components.html(
                 <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
               </div>
             </section>
-            <section class="card goal-card">
+            <section class="card goal-card" id="processCard" hidden>
               <h2>이차방정식 풀이 과정</h2>
               <div class="solving-steps" id="processHint"></div>
               <div class="solving-steps" id="solvingSteps" hidden></div>
@@ -214,6 +214,7 @@ components.html(
           const expression = document.getElementById("expression");
           const progressText = document.getElementById("progressText");
           const progressBar = document.getElementById("progressBar");
+          const processCard = document.getElementById("processCard");
           const processHint = document.getElementById("processHint");
           const solvingSteps = document.getElementById("solvingSteps");
           const revealBtn = document.getElementById("revealBtn");
@@ -365,6 +366,7 @@ components.html(
             problemLabel.textContent = problemIndex === 0 ? "오늘의 문제" : "도전 문제";
             processHint.textContent = `x² + ${2 * a}x = ${rightSide}`;
             factorized.textContent = `(x + ${a})² = ${a * a + rightSide}`;
+            processCard.hidden = true;
             nextProblemBtn.hidden = true;
             areaSumPanel.hidden = false;
             solutionPanel.hidden = true;
@@ -581,6 +583,7 @@ components.html(
               ? `정답이에요! ${solvingSteps.lastElementChild.textContent}`
               : "다시 생각해 보세요. 제곱근을 풀 때 ± 두 경우를 모두 확인해요.";
             solvingSteps.hidden = false;
+            processCard.hidden = false;
             nextProblemBtn.hidden = !correct || problemIndex >= problems.length - 1;
           });
 
