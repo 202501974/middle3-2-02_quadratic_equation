@@ -67,25 +67,25 @@ components.html(
         .piece:active { cursor: grabbing; }
         .piece.selected { outline: 3px solid #293d72; outline-offset: 2px; z-index: 5; }
         .piece.dragging { opacity: .88; box-shadow: 0 8px 20px #34415d36; z-index: 10; }
-        .piece-x2 { width: 112px; height: 112px; background: #7d8df1; color: white; font-size: 22px; }
-        .piece-x-horizontal { width: 140px; height: 112px; background: #ffbf66; color: #653e08; font-size: 14px; }
-        .piece-x-vertical { width: 112px; height: 140px; background: #f0ad50; color: #653e08; font-size: 14px; }
-        .piece-x3 { width: 112px; height: 84px; background: #f2a979; color: #663b22; font-size: 13px; }
-        .piece-x6 { width: 168px; height: 112px; background: #e58b82; color: #642f2a; font-size: 13px; }
+        .piece-x2 { width: 84px; height: 84px; background: #7d8df1; color: white; font-size: 20px; }
+        .piece-x-horizontal { width: 140px; height: 84px; background: #ffbf66; color: #653e08; font-size: 14px; }
+        .piece-x-vertical { width: 84px; height: 140px; background: #f0ad50; color: #653e08; font-size: 14px; }
+        .piece-x4 { width: 112px; height: 84px; background: #f2a979; color: #663b22; font-size: 13px; }
+        .piece-x6 { width: 168px; height: 84px; background: #e58b82; color: #642f2a; font-size: 13px; }
         .piece-square25 { width: 140px; height: 140px; background: #69c9ad; color: #155945; font-size: 16px; }
-        .piece-square9 { width: 84px; height: 84px; background: #ec9b9b; color: #6a3030; font-size: 16px; }
+        .piece-square16 { width: 112px; height: 112px; background: #ec9b9b; color: #6a3030; font-size: 16px; }
         .piece-square36 { width: 168px; height: 168px; background: #d7a3d8; color: #563458; font-size: 16px; }
         .tray { min-height: 150px; padding: 12px; border-radius: 12px; background: #f7f8fc; border: 1px solid #edf0f6; }
         .tray-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: #78849a; font-size: 12px; font-weight: 700; }
         .tray-pieces { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; min-height: 74px; }
         .tray .piece { position: relative; inset: auto !important; flex: 0 0 auto; }
-        .tray .piece-x2 { width: 56px; height: 56px; font-size: 15px; }
-        .tray .piece-x-horizontal { width: 70px; height: 56px; font-size: 11px; }
-        .tray .piece-x-vertical { width: 56px; height: 70px; font-size: 11px; }
-        .tray .piece-x3 { width: 56px; height: 42px; font-size: 10px; }
-        .tray .piece-x6 { width: 84px; height: 56px; font-size: 10px; }
+        .tray .piece-x2 { width: 42px; height: 42px; font-size: 13px; }
+        .tray .piece-x-horizontal { width: 70px; height: 42px; font-size: 11px; }
+        .tray .piece-x-vertical { width: 42px; height: 70px; font-size: 11px; }
+        .tray .piece-x4 { width: 56px; height: 42px; font-size: 10px; }
+        .tray .piece-x6 { width: 84px; height: 42px; font-size: 10px; }
         .tray .piece-square25 { width: 70px; height: 70px; font-size: 14px; }
-        .tray .piece-square9 { width: 42px; height: 42px; font-size: 11px; }
+        .tray .piece-square16 { width: 56px; height: 56px; font-size: 12px; }
         .tray .piece-square36 { width: 84px; height: 84px; font-size: 12px; }
         .tray .piece.selected { outline-offset: 1px; }
         .tray-feedback { min-height: 18px; margin: 8px 0 0; color: #9c5960; font-size: 11px; }
@@ -161,7 +161,7 @@ components.html(
               </div>
             </div>
             <div class="tray">
-              <div class="tray-title"><span>도형 조각</span><span>필수: x² · 5x 가로/세로 · 25 / 오답: 3x, 6x, 9, 36</span></div>
+              <div class="tray-title"><span>도형 조각</span><span>필수: x² · 5x 가로/세로 · 25 / 오답: 4x·6x 각 2개, 16·36</span></div>
               <div class="tray-pieces" id="tray"></div>
               <p class="tray-feedback" id="trayFeedback" aria-live="polite"></p>
             </div>
@@ -253,35 +253,37 @@ components.html(
           createPiece("x-horizontal", "x-horizontal", "5x", "가로로 긴 5x 직사각형");
           createPiece("x-vertical", "x-vertical", "5x", "세로로 긴 5x 직사각형");
           createPiece("square25", "square25", "25", "넓이가 25인 정사각형");
-          createPiece("x3", "x3", "3x", "넓이가 3x인 오답 직사각형", false);
-          createPiece("x6", "x6", "6x", "넓이가 6x인 오답 직사각형", false);
-          createPiece("square9", "square9", "9", "넓이가 9인 오답 정사각형", false);
+          for (let i = 0; i < 2; i++) {
+            createPiece("x4", `x4-${i}`, "4x", "넓이가 4x인 오답 직사각형", false);
+            createPiece("x6", `x6-${i}`, "6x", "넓이가 6x인 오답 직사각형", false);
+          }
+          createPiece("square16", "square16", "16", "넓이가 16인 오답 정사각형", false);
           createPiece("square36", "square36", "36", "넓이가 36인 오답 정사각형", false);
 
           function cellsFor(piece, x, y) {
             const cells = [];
             if (piece.type === "x2") {
-              for (let row = 0; row < 4; row++) {
-                for (let col = 0; col < 4; col++) cells.push(`${x + col * unit},${y + row * unit}`);
+              for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
             } else if (piece.type === "x-horizontal") {
-              for (let row = 0; row < 4; row++) {
+              for (let row = 0; row < 3; row++) {
                 for (let col = 0; col < 5; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
             } else if (piece.type === "x-vertical") {
               for (let row = 0; row < 5; row++) {
-                for (let col = 0; col < 4; col++) cells.push(`${x + col * unit},${y + row * unit}`);
+                for (let col = 0; col < 3; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
-            } else if (piece.type === "x3") {
+            } else if (piece.type === "x4") {
               for (let row = 0; row < 3; row++) {
                 for (let col = 0; col < 4; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
             } else if (piece.type === "x6") {
-              for (let row = 0; row < 4; row++) {
+              for (let row = 0; row < 3; row++) {
                 for (let col = 0; col < 6; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
             } else {
-              const side = piece.type === "square9" ? 3 : piece.type === "square36" ? 6 : 5;
+              const side = piece.type === "square16" ? 4 : piece.type === "square36" ? 6 : 5;
               for (let row = 0; row < side; row++) {
                 for (let col = 0; col < side; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
@@ -290,12 +292,12 @@ components.html(
           }
 
           function dimensions(piece) {
-            if (piece.type === "x2") return { width: 4 * unit, height: 4 * unit };
-            if (piece.type === "x-horizontal") return { width: 5 * unit, height: 4 * unit };
-            if (piece.type === "x-vertical") return { width: 4 * unit, height: 5 * unit };
-            if (piece.type === "x3") return { width: 4 * unit, height: 3 * unit };
-            if (piece.type === "x6") return { width: 6 * unit, height: 4 * unit };
-            const side = piece.type === "square9" ? 3 : piece.type === "square36" ? 6 : 5;
+            if (piece.type === "x2") return { width: 3 * unit, height: 3 * unit };
+            if (piece.type === "x-horizontal") return { width: 5 * unit, height: 3 * unit };
+            if (piece.type === "x-vertical") return { width: 3 * unit, height: 5 * unit };
+            if (piece.type === "x4") return { width: 4 * unit, height: 3 * unit };
+            if (piece.type === "x6") return { width: 6 * unit, height: 3 * unit };
+            const side = piece.type === "square16" ? 4 : piece.type === "square36" ? 6 : 5;
             return { width: side * unit, height: side * unit };
           }
 
@@ -333,9 +335,9 @@ components.html(
             const distractorAreas = pieces
               .filter(piece => !piece.required && piece.placed)
               .map(piece => ({
-                x3: 12,
-                x6: 24,
-                square9: 9,
+                x4: 12,
+                x6: 18,
+                square16: 16,
                 square36: 36
               }[piece.type]));
             const terms = [];
@@ -353,11 +355,11 @@ components.html(
             }
             const coordinates = [...filled].map(cell => cell.split(",").map(Number));
             const isSquareArrangement = coordinates.length > 0
-              && Math.max(...coordinates.map(([x]) => x)) - Math.min(...coordinates.map(([x]) => x)) === 8 * unit
-              && Math.max(...coordinates.map(([, y]) => y)) - Math.min(...coordinates.map(([, y]) => y)) === 8 * unit;
+              && Math.max(...coordinates.map(([x]) => x)) - Math.min(...coordinates.map(([x]) => x)) === 7 * unit
+              && Math.max(...coordinates.map(([, y]) => y)) - Math.min(...coordinates.map(([, y]) => y)) === 7 * unit;
             const distractorPlaced = distractorAreas.length > 0;
             const complete = x2Placed && rectangleCount === 2 && square25Placed && !distractorPlaced
-              && filled.size === 81
+              && filled.size === 64
               && isSquareArrangement;
             if (complete) areaSum = "x² + 10x + 25 = 24 + 25";
             else if (x2Placed && rectangleCount === 2 && !square25Placed && !distractorPlaced) areaSum += " = 24";
