@@ -56,7 +56,7 @@ components.html(
           background-color: #fbfcff;
           background-image: linear-gradient(#e9edf5 1px, transparent 1px), linear-gradient(90deg, #e9edf5 1px, transparent 1px);
           background-size: 28px 28px; border: 2px dashed #cbd4e4; border-radius: 12px;
-          touch-action: none; overflow: hidden;
+          touch-action: none; overflow: visible;
         }
         .piece {
           position: absolute; display: grid; place-items: center; border: 2px solid #fff;
@@ -67,6 +67,7 @@ components.html(
         .piece:active { cursor: grabbing; }
         .piece.selected { outline: none; box-shadow: inset 0 0 0 3px #293d72; z-index: 5; }
         .piece.dragging { opacity: .88; box-shadow: none; z-index: 10; }
+        .board .piece.dragging { z-index: 20; }
         .piece-x2 { width: 84px; height: 84px; background: #7d8df1; color: white; font-size: 20px; }
         .piece-x-horizontal { width: 140px; height: 84px; background: #ffbf66; color: #653e08; font-size: 14px; }
         .piece-x-vertical { width: 84px; height: 140px; background: #f0ad50; color: #653e08; font-size: 14px; }
