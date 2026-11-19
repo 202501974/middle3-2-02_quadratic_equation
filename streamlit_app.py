@@ -273,10 +273,11 @@ components.html(
 
           function buildPieces() {
             const a = problem.coefficient;
+            const xSide = Math.min(3, a);
             const distractorSizes = [];
             for (let distance = 1; distractorSizes.length < 2; distance++) {
               for (const size of [a - distance, a + distance]) {
-                if (size > 0 && size !== 3) distractorSizes.push(size);
+                if (size > 0 && size !== xSide) distractorSizes.push(size);
                 if (distractorSizes.length === 2) break;
               }
             }
@@ -285,9 +286,9 @@ components.html(
             pieces.length = 0;
             tray.replaceChildren();
             board.replaceChildren();
-            createPiece({ type: "x2", id: "x2", label: "x²", description: "x 제곱 정사각형", columns: 3, rows: 3, term: "x²" });
-            createPiece({ type: "x-horizontal", id: "x-horizontal", label: `${a}x`, description: `가로로 긴 ${a}x 직사각형`, columns: a, rows: 3, term: `${a}x` });
-            createPiece({ type: "x-vertical", id: "x-vertical", label: `${a}x`, description: `세로로 긴 ${a}x 직사각형`, columns: 3, rows: a, term: `${a}x` });
+            createPiece({ type: "x2", id: "x2", label: "x²", description: "x 제곱 정사각형", columns: xSide, rows: xSide, term: "x²" });
+            createPiece({ type: "x-horizontal", id: "x-horizontal", label: `${a}x`, description: `가로로 긴 ${a}x 직사각형`, columns: a, rows: xSide, term: `${a}x` });
+            createPiece({ type: "x-vertical", id: "x-vertical", label: `${a}x`, description: `세로로 긴 ${a}x 직사각형`, columns: xSide, rows: a, term: `${a}x` });
             createPiece({ type: "square", id: "square-correct", label: `${a * a}`, description: `넓이가 ${a * a}인 정사각형`, columns: a, rows: a, term: `${a * a}` });
             for (const coefficient of wrongCoefficients) {
               for (const direction of ["horizontal", "vertical"]) {
@@ -296,8 +297,8 @@ components.html(
                   id: `rect-${coefficient}-${direction}`,
                   label: `${coefficient}x`,
                   description: `${direction === "horizontal" ? "가로" : "세로"}로 긴 ${coefficient}x 오답 직사각형`,
-                  columns: direction === "horizontal" ? coefficient : 3,
-                  rows: direction === "horizontal" ? 3 : coefficient,
+                  columns: direction === "horizontal" ? coefficient : xSide,
+                  rows: direction === "horizontal" ? xSide : coefficient,
                   required: false,
                   term: `${coefficient}x`
                 });
@@ -460,7 +461,7 @@ components.html(
               }
             }
             const coordinates = [...filled].map(cell => cell.split(",").map(Number));
-            const targetSide = problem.coefficient + 3;
+            const targetSide = problem.coefficient + Math.min(3, problem.coefficient);
             const isSquareArrangement = coordinates.length > 0
               && Math.max(...coordinates.map(([x]) => x)) - Math.min(...coordinates.map(([x]) => x)) === (targetSide - 1) * unit
               && Math.max(...coordinates.map(([, y]) => y)) - Math.min(...coordinates.map(([, y]) => y)) === (targetSide - 1) * unit;
