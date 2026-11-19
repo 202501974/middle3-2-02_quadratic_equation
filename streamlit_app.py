@@ -131,7 +131,8 @@ components.html(
         .goal-card { background: #fff9eb; border-color: #f4e8c9; }
         .goal-card h2 { color: #77551d; }
         .goal-card p { margin: 8px 0 0; color: #806b46; font-size: 12px; line-height: 1.6; }
-        .solving-steps { margin: 12px 0 0; padding-left: 22px; color: #66583e; font-size: 13px; line-height: 1.8; }
+        .solving-steps { margin-top: 12px; color: #66583e; font-size: 15px; font-weight: 700; line-height: 1.9; overflow-wrap: anywhere; }
+        .solving-steps div + div::before { content: "⇔"; display: block; color: #9c875f; font-size: 13px; }
         @media (max-width: 760px) {
           .app { padding: 14px 12px 24px; }
           .problem-card { align-items: flex-start; flex-direction: column; gap: 7px; padding: 14px 16px; }
@@ -210,13 +211,14 @@ components.html(
             </section>
             <section class="card goal-card">
               <h2>이차방정식 풀이 과정</h2>
-              <p id="processHint">퍼즐을 완성한 뒤 버튼을 눌러 풀이 과정을 확인해 보세요.</p>
-              <ol class="solving-steps" id="solvingSteps" hidden>
-                <li>양변에 25를 더해요: x² + 10x + 25 = 24 + 25</li>
-                <li>완전제곱식으로 바꿔요: (x + 5)² = 49</li>
-                <li>제곱근을 구해요: x + 5 = ±7</li>
-                <li>정리하면 x = 2 또는 x = -12예요.</li>
-              </ol>
+              <div class="solving-steps" id="processHint">x² + 10x = 24</div>
+              <div class="solving-steps" id="solvingSteps" hidden>
+                <div>x² + 10x = 24</div>
+                <div>x² + 10x + 25 = 24 + 25</div>
+                <div>(x + 5)² = 49</div>
+                <div>x + 5 = ±7</div>
+                <div>x = 2 또는 x = -12</div>
+              </div>
             </section>
           </aside>
         </div>
