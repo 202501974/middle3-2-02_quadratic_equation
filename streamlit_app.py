@@ -150,21 +150,22 @@ components.html(
               </div>
             </div>
             <div class="tray">
-              <div class="tray-title"><span>도형 조각</span><span id="trayDescription"></span></div>
+              <div class="tray-title"><span>도형 조각</span><span>조각을 골라 퍼즐 판에 놓아 보세요.</span></div>
               <div class="tray-pieces" id="tray"></div>
               <p class="tray-feedback" id="trayFeedback" aria-live="polite"></p>
             </div>
             <div class="tools">
               <button class="btn" id="resetBtn" type="button">다시 시작</button>
+              <button class="btn primary" id="nextProblemBtn" type="button" hidden>다른 문제 풀어보기</button>
             </div>
           </section>
 
           <aside class="side">
             <section class="card lesson-card">
               <h2>활동 방법</h2>
-              <div class="step"><span class="step-num">1</span><p><b>x²</b> 타일을 큰 정사각형의 한쪽 모서리에 놓으세요.</p></div>
-              <div class="step"><span class="step-num">2</span><p id="rectangleInstruction"><b>가로 5x</b>와 <b>세로 5x</b> 조각을 x² 타일의 두 변에 붙여 보세요.</p></div>
-              <div class="step"><span class="step-num">3</span><p id="squareInstruction">남은 <b>5 × 5</b> 모서리를 <b>25</b> 정사각형으로 채워 보세요.</p></div>
+              <div class="step"><span class="step-num">1</span><p>조각을 퍼즐 판 위에 올려 보세요.</p></div>
+              <div class="step"><span class="step-num">2</span><p>조각을 옮겨 큰 정사각형을 만들어 보세요.</p></div>
+              <div class="step"><span class="step-num">3</span><p>도형의 넓이 합이 어떻게 변하는지 살펴보세요.</p></div>
             </section>
             <section class="card equation-card">
               <h2>도형의 넓이 식</h2>
@@ -192,7 +193,6 @@ components.html(
               <h2>이차방정식 풀이 과정</h2>
               <div class="solving-steps" id="processHint"></div>
               <div class="solving-steps" id="solvingSteps" hidden></div>
-              <button class="btn primary" id="nextProblemBtn" type="button" hidden>다른 문제 풀기</button>
             </section>
           </aside>
         </div>
@@ -216,15 +216,17 @@ components.html(
           const choices = document.getElementById("choices");
           const problemExpression = document.getElementById("problemExpression");
           const problemLabel = document.getElementById("problemLabel");
-          const trayDescription = document.getElementById("trayDescription");
-          const rectangleInstruction = document.getElementById("rectangleInstruction");
-          const squareInstruction = document.getElementById("squareInstruction");
           const nextProblemBtn = document.getElementById("nextProblemBtn");
           const unit = 28;
           const pieces = [];
           const problems = [
             { coefficient: 5, rightSide: 24 },
-            { coefficient: 4, rightSide: 9 }
+            { coefficient: 4, rightSide: 9 },
+            { coefficient: 3, rightSide: 16 },
+            { coefficient: 6, rightSide: 13 },
+            { coefficient: 7, rightSide: 32 },
+            { coefficient: 8, rightSide: 17 },
+            { coefficient: 2, rightSide: 21 }
           ];
           let problemIndex = 0;
           let problem = problems[problemIndex];
@@ -286,11 +288,8 @@ components.html(
                 term: `${side * side}`
               });
             }
-            trayDescription.textContent = `필수: x² · ${a}x 가로/세로 · ${a * a} / 오답: ${wrongCoefficients[0]}x·${wrongCoefficients[1]}x 가로/세로, ${wrongSquares[0] ** 2}·${wrongSquares[1] ** 2}`;
-            rectangleInstruction.innerHTML = `<b>가로 ${a}x</b>와 <b>세로 ${a}x</b> 조각을 x² 타일의 두 변에 붙여 보세요.`;
-            squareInstruction.innerHTML = `남은 <b>${a} × ${a}</b> 모서리를 <b>${a * a}</b> 정사각형으로 채워 보세요.`;
             problemExpression.textContent = `x² + ${2 * a}x = ${problem.rightSide}`;
-            problemLabel.textContent = problemIndex === 0 ? "오늘의 문제" : "도전 문제";
+            problemLabel.textContent = problemIndex === 0 ? "오늘의 문제" : `도전 문제 ${problemIndex} / ${problems.length - 1}`;
             processHint.textContent = `x² + ${2 * a}x = ${problem.rightSide}`;
             solvingSteps.innerHTML = "";
             answerChoicesMarkup();
@@ -353,9 +352,6 @@ components.html(
             problemLabel.textContent = problemIndex === 0 ? "오늘의 문제" : "도전 문제";
             processHint.textContent = `x² + ${2 * a}x = ${rightSide}`;
             factorized.textContent = `(x + ${a})² = ${a * a + rightSide}`;
-            trayDescription.textContent = `필수: x² · ${a}x 가로/세로 · ${a * a} / 오답: ${a - 1}x·${a + 1}x 가로/세로, ${(a - 1) ** 2}·${(a + 1) ** 2}`;
-            rectangleInstruction.innerHTML = `<b>가로 ${a}x</b>와 <b>세로 ${a}x</b> 조각을 x² 타일의 두 변에 붙여 보세요.`;
-            squareInstruction.innerHTML = `남은 <b>${a} × ${a}</b> 모서리를 <b>${a * a}</b> 정사각형으로 채워 보세요.`;
             nextProblemBtn.hidden = true;
             areaSumPanel.hidden = false;
             solutionPanel.hidden = true;
@@ -561,12 +557,12 @@ components.html(
               ? `정답이에요! ${solvingSteps.lastElementChild.textContent}`
               : "다시 생각해 보세요. 제곱근을 풀 때 ± 두 경우를 모두 확인해요.";
             solvingSteps.hidden = false;
-            nextProblemBtn.hidden = !correct || problemIndex !== 0;
+            nextProblemBtn.hidden = !correct || problemIndex >= problems.length - 1;
           });
 
           nextProblemBtn.addEventListener("click", () => {
-            if (problemIndex !== 0) return;
-            problemIndex = 1;
+            if (problemIndex >= problems.length - 1) return;
+            problemIndex += 1;
             setupProblem();
           });
 
