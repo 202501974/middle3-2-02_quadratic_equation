@@ -131,8 +131,7 @@ components.html(
         .goal-card { background: #fff9eb; border-color: #f4e8c9; }
         .goal-card h2 { color: #77551d; }
         .goal-card p { margin: 8px 0 0; color: #806b46; font-size: 12px; line-height: 1.6; }
-        .complete-message { display: none; margin-top: 12px; padding: 10px; border-radius: 10px; background: #eaf8f1; color: #257653; font-size: 12px; font-weight: 700; line-height: 1.5; }
-        .complete-message.show { display: block; }
+        .solving-steps { margin: 12px 0 0; padding-left: 22px; color: #66583e; font-size: 13px; line-height: 1.8; }
         @media (max-width: 760px) {
           .app { padding: 14px 12px 24px; }
           .problem-card { align-items: flex-start; flex-direction: column; gap: 7px; padding: 14px 16px; }
@@ -210,9 +209,14 @@ components.html(
               </div>
             </section>
             <section class="card goal-card">
-              <h2>오늘의 발견</h2>
-              <p>비어 있는 모서리는 한 변이 5인 정사각형이에요. 단위 넓이로는 <b>5 × 5 = 25</b>이므로 양변에 25를 더하면 식이 완전제곱식이 됩니다.</p>
-              <div class="complete-message" id="completeMessage">🎉 큰 정사각형을 완성했어요! 오른쪽 버튼을 눌러 식을 확인해 보세요.</div>
+              <h2>이차방정식 풀이 과정</h2>
+              <p id="processHint">퍼즐을 완성한 뒤 버튼을 눌러 풀이 과정을 확인해 보세요.</p>
+              <ol class="solving-steps" id="solvingSteps" hidden>
+                <li>양변에 25를 더해요: x² + 10x + 25 = 24 + 25</li>
+                <li>완전제곱식으로 바꿔요: (x + 5)² = 49</li>
+                <li>제곱근을 구해요: x + 5 = ±7</li>
+                <li>정리하면 x = 2 또는 x = -12예요.</li>
+              </ol>
             </section>
           </aside>
         </div>
@@ -226,7 +230,8 @@ components.html(
           const expression = document.getElementById("expression");
           const progressText = document.getElementById("progressText");
           const progressBar = document.getElementById("progressBar");
-          const completeMessage = document.getElementById("completeMessage");
+          const processHint = document.getElementById("processHint");
+          const solvingSteps = document.getElementById("solvingSteps");
           const revealBtn = document.getElementById("revealBtn");
           const solutionPanel = document.getElementById("solutionPanel");
           const factorized = document.getElementById("factorized");
@@ -371,13 +376,14 @@ components.html(
             expression.classList.toggle("empty", !areaSum);
 
             trayFeedback.textContent = distractorPlaced ? "오답 조각은 필요한 빈칸의 크기와 맞지 않아요. 보관함으로 옮겨 주세요." : "";
-            completeMessage.classList.toggle("show", complete);
             revealBtn.disabled = !complete;
             if (!complete) {
               areaSumPanel.hidden = false;
               solutionPanel.hidden = true;
               revealBtn.hidden = false;
               revealBtn.textContent = "완전제곱식으로 바꾸기";
+              processHint.hidden = false;
+              solvingSteps.hidden = true;
               answerChoices.forEach(choice => { choice.checked = false; });
               checkAnswerBtn.disabled = true;
               answerFeedback.textContent = "";
@@ -481,6 +487,8 @@ components.html(
             areaSumPanel.hidden = true;
             solutionPanel.hidden = false;
             revealBtn.hidden = true;
+            processHint.hidden = true;
+            solvingSteps.hidden = false;
             factorized.textContent = "(x + 5)² = 49";
           });
 
