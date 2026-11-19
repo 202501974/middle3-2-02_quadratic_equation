@@ -132,7 +132,6 @@ components.html(
         .goal-card h2 { color: #77551d; }
         .goal-card p { margin: 8px 0 0; color: #806b46; font-size: 12px; line-height: 1.6; }
         .solving-steps { margin-top: 12px; color: #66583e; font-size: 15px; font-weight: 700; line-height: 1.9; overflow-wrap: anywhere; }
-        .solving-steps div + div::before { content: "⇔"; display: block; color: #9c875f; font-size: 13px; }
         @media (max-width: 760px) {
           .app { padding: 14px 12px 24px; }
           .problem-card { align-items: flex-start; flex-direction: column; gap: 7px; padding: 14px 16px; }
@@ -490,7 +489,7 @@ components.html(
             solutionPanel.hidden = false;
             revealBtn.hidden = true;
             processHint.hidden = true;
-            solvingSteps.hidden = false;
+            solvingSteps.hidden = true;
             factorized.textContent = "(x + 5)² = 49";
           });
 
@@ -498,6 +497,7 @@ components.html(
             choice.addEventListener("change", () => {
               checkAnswerBtn.disabled = false;
               answerFeedback.textContent = "";
+              solvingSteps.hidden = true;
             });
           });
 
@@ -507,6 +507,7 @@ components.html(
             answerFeedback.textContent = selectedAnswer.value === "both"
               ? "정답이에요! x = 2 또는 x = -12입니다."
               : "다시 생각해 보세요. 제곱근을 풀 때 ± 두 경우를 모두 확인해요.";
+            solvingSteps.hidden = false;
           });
 
           document.getElementById("resetBtn").addEventListener("click", () => {
