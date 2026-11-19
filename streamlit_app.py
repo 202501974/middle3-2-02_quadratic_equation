@@ -61,12 +61,12 @@ components.html(
         .piece {
           position: absolute; display: grid; place-items: center; border: 2px solid #fff;
           border-radius: 8px; cursor: grab; user-select: none; touch-action: none;
-          box-shadow: 0 3px 8px #34415d20; transition: box-shadow .12s, filter .12s;
+          box-shadow: none; transition: filter .12s;
           z-index: 2; font-weight: 800;
         }
         .piece:active { cursor: grabbing; }
-        .piece.selected { outline: 3px solid #293d72; outline-offset: 2px; z-index: 5; }
-        .piece.dragging { opacity: .88; box-shadow: 0 8px 20px #34415d36; z-index: 10; }
+        .piece.selected { outline: none; box-shadow: inset 0 0 0 3px #293d72; z-index: 5; }
+        .piece.dragging { opacity: .88; box-shadow: none; z-index: 10; }
         .piece-x2 { width: 84px; height: 84px; background: #7d8df1; color: white; font-size: 20px; }
         .piece-x-horizontal { width: 140px; height: 84px; background: #ffbf66; color: #653e08; font-size: 14px; }
         .piece-x-vertical { width: 84px; height: 140px; background: #f0ad50; color: #653e08; font-size: 14px; }
@@ -91,7 +91,6 @@ components.html(
         .tray .piece-square25 { width: 70px; height: 70px; font-size: 14px; }
         .tray .piece-square16 { width: 56px; height: 56px; font-size: 12px; }
         .tray .piece-square36 { width: 84px; height: 84px; font-size: 12px; }
-        .tray .piece.selected { outline-offset: 1px; }
         .tray-feedback { min-height: 18px; margin: 8px 0 0; color: #9c5960; font-size: 11px; }
         .tools { display: flex; gap: 8px; margin-top: 13px; }
         .btn { border: 1px solid #dfe5ef; background: white; color: #34425d; border-radius: 10px; padding: 9px 13px; font-size: 12px; font-weight: 700; cursor: pointer; transition: .15s; }
@@ -328,6 +327,24 @@ components.html(
             return cellsFor(piece, x, y).every(cell => !occupied.has(cell));
           }
 
+          function nearestValidPlacement(piece, targetX, targetY) {
+            if (validPlacement(piece, targetX, targetY)) return { x: targetX, y: targetY };
+            const { width, height } = dimensions(piece);
+            let nearest = null;
+            let nearestDistance = Infinity;
+            for (let y = 0; y + height <= 12 * unit; y += unit) {
+              for (let x = 0; x + width <= 12 * unit; x += unit) {
+                if (!validPlacement(piece, x, y)) continue;
+                const distance = (x - targetX) ** 2 + (y - targetY) ** 2;
+                if (distance < nearestDistance) {
+                  nearest = { x, y };
+                  nearestDistance = distance;
+                }
+              }
+            }
+            return nearest;
+          }
+
           function setPosition(piece, x, y) {
             piece.el.style.left = `${x}px`;
             piece.el.style.top = `${y}px`;
@@ -413,12 +430,24 @@ components.html(
               piece.style.height = "";
               board.appendChild(piece);
             }
-            piece.classList.add("dragging");
             const boardRect = board.getBoundingClientRect();
             const scale = boardRect.width / board.offsetWidth;
             const horizontalPosition = (event.clientX - rect.left) / rect.width;
             const verticalPosition = (event.clientY - rect.top) / rect.height;
             const pieceSize = dimensions(model);
+            const targetX = Math.round(((event.clientX - boardRect.left) / scale - horizontalPosition * pieceSize.width) / unit) * unit;
+            const targetY = Math.round(((event.clientY - boardRect.top) / scale - verticalPosition * pieceSize.height) / unit) * unit;
+            const initialPosition = nearestValidPlacement(model, targetX, targetY);
+            if (!initialPosition) {
+              if (!wasPlaced) {
+                piece.style.cssText = "";
+                tray.appendChild(piece);
+              }
+              choose(null);
+              return;
+            }
+            setPosition(model, initialPosition.x, initialPosition.y);
+            piece.classList.add("dragging");
             drag = {
               model, wasPlaced, scale,
               offsetX: horizontalPosition * pieceSize.width,
@@ -430,11 +459,10 @@ components.html(
           function moveDrag(event) {
             if (!drag) return;
             const boardRect = board.getBoundingClientRect();
-            const x = (event.clientX - boardRect.left) / drag.scale - drag.offsetX;
-            const y = (event.clientY - boardRect.top) / drag.scale - drag.offsetY;
-            const el = drag.model.el;
-            el.style.left = `${x}px`;
-            el.style.top = `${y}px`;
+            const targetX = Math.round(((event.clientX - boardRect.left) / drag.scale - drag.offsetX) / unit) * unit;
+            const targetY = Math.round(((event.clientY - boardRect.top) / drag.scale - drag.offsetY) / unit) * unit;
+            const position = nearestValidPlacement(drag.model, targetX, targetY);
+            if (position) setPosition(drag.model, position.x, position.y);
           }
 
           function endDrag(event) {
