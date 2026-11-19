@@ -71,6 +71,8 @@ components.html(
         .piece-x-horizontal { width: 140px; height: 112px; background: #ffbf66; color: #653e08; font-size: 14px; }
         .piece-x-vertical { width: 112px; height: 140px; background: #f0ad50; color: #653e08; font-size: 14px; }
         .piece-square25 { width: 140px; height: 140px; background: #69c9ad; color: #155945; font-size: 16px; }
+        .piece-square9 { width: 84px; height: 84px; background: #ec9b9b; color: #6a3030; font-size: 16px; }
+        .piece-square36 { width: 168px; height: 168px; background: #d7a3d8; color: #563458; font-size: 16px; }
         .tray { min-height: 150px; padding: 12px; border-radius: 12px; background: #f7f8fc; border: 1px solid #edf0f6; }
         .tray-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: #78849a; font-size: 12px; font-weight: 700; }
         .tray-pieces { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; min-height: 74px; }
@@ -79,6 +81,8 @@ components.html(
         .tray .piece-x-horizontal { width: 100px; height: 50px; font-size: 12px; }
         .tray .piece-x-vertical { width: 50px; height: 100px; font-size: 12px; }
         .tray .piece-square25 { width: 70px; height: 70px; font-size: 14px; }
+        .tray .piece-square9 { width: 45px; height: 45px; font-size: 12px; }
+        .tray .piece-square36 { width: 60px; height: 60px; font-size: 12px; }
         .tray .piece.selected { outline-offset: 1px; }
         .tools { display: flex; gap: 8px; margin-top: 13px; }
         .btn { border: 1px solid #dfe5ef; background: white; color: #34425d; border-radius: 10px; padding: 9px 13px; font-size: 12px; font-weight: 700; cursor: pointer; transition: .15s; }
@@ -99,9 +103,10 @@ components.html(
         .expression .term-x2 { color: #b7c1ff; }
         .expression .term-x { color: #ffd18e; }
         .expression .term-unit { color: #8fe1c7; }
+        .expression .term-distractor { color: #ffaaaa; }
         .expression.result { min-height: 28px; font-size: 17px; color: #d7ddff; }
         .formula-divider { height: 1px; margin: 13px 0; background: #ffffff20; }
-        .solution-panel[hidden] { display: none; }
+        #areaSumPanel[hidden], .solution-panel[hidden] { display: none !important; }
         .quiz { margin: 12px 0 0; padding: 12px 0 0; border: 0; border-top: 1px solid #ffffff20; }
         .quiz legend { padding: 0; color: #dce3ff; font-size: 13px; font-weight: 700; }
         .choices { display: grid; gap: 7px; margin-top: 10px; }
@@ -144,7 +149,7 @@ components.html(
         <div class="layout">
           <section class="card board-card">
             <div class="section-head">
-              <div><h2>큰 정사각형 만들기</h2><p class="hint">보관함의 네 조각을 판에 끌어 놓아 빈틈없이 채워 보세요.</p></div>
+              <div><h2>큰 정사각형 만들기</h2><p class="hint">필요한 네 조각을 골라 판에 끌어 놓아 빈틈없이 채워 보세요. 크기가 다른 사각형은 오답 조각이에요.</p></div>
               <span class="badge" id="statusBadge">시작해 볼까요?</span>
             </div>
             <div class="board-stage">
@@ -152,7 +157,7 @@ components.html(
               </div>
             </div>
             <div class="tray">
-              <div class="tray-title"><span>도형 조각</span><span>x² 1개 · 5x 가로/세로 각 1개 · 25 정사각형 1개</span></div>
+              <div class="tray-title"><span>도형 조각</span><span>필수: x² · 5x 가로/세로 · 25 / 오답: 9, 36</span></div>
               <div class="tray-pieces" id="tray"></div>
             </div>
             <div class="tools">
@@ -169,12 +174,15 @@ components.html(
             </section>
             <section class="card equation-card">
               <h2>도형의 넓이 식</h2>
-              <div class="equation-label">현재 배치한 도형의 넓이 합</div>
-              <div class="expression empty" id="expression" aria-live="polite">아직 배치한 도형이 없어요</div>
-              <div class="formula-divider"></div>
+              <div id="areaSumPanel">
+                <div class="equation-label">현재 배치한 도형의 넓이 합</div>
+                <div class="expression empty" id="expression" aria-live="polite">아직 배치한 도형이 없어요</div>
+                <div class="formula-divider"></div>
+              </div>
               <button class="btn primary" id="revealBtn" type="button" disabled>완전제곱식으로 바꾸기</button>
               <div class="solution-panel" id="solutionPanel" hidden>
-                <div class="expression result" id="equationStep">(x + 5)² = 49</div>
+                <div class="expression result" id="equationStep">x² + 10x + 25 = 24 + 25</div>
+                <div class="expression result" id="factorized">(x + 5)² = 49</div>
                 <fieldset class="quiz">
                   <legend>원래 방정식의 해를 모두 고른 것은?</legend>
                   <div class="choices">
@@ -205,6 +213,7 @@ components.html(
         (() => {
           const board = document.getElementById("board");
           const tray = document.getElementById("tray");
+          const areaSumPanel = document.getElementById("areaSumPanel");
           const expression = document.getElementById("expression");
           const progressText = document.getElementById("progressText");
           const progressBar = document.getElementById("progressBar");
@@ -212,6 +221,7 @@ components.html(
           const completeMessage = document.getElementById("completeMessage");
           const revealBtn = document.getElementById("revealBtn");
           const solutionPanel = document.getElementById("solutionPanel");
+          const factorized = document.getElementById("factorized");
           const checkAnswerBtn = document.getElementById("checkAnswerBtn");
           const answerFeedback = document.getElementById("answerFeedback");
           const answerChoices = [...document.querySelectorAll('input[name="answer"]')];
@@ -220,7 +230,7 @@ components.html(
           let selected = null;
           let drag = null;
 
-          function createPiece(type, id, label, description) {
+          function createPiece(type, id, label, description, required = true) {
             const piece = document.createElement("div");
             piece.className = `piece piece-${type}`;
             piece.dataset.type = type;
@@ -230,7 +240,7 @@ components.html(
             piece.setAttribute("aria-label", description);
             piece.tabIndex = 0;
             tray.appendChild(piece);
-            pieces.push({ el: piece, type, id, placed: false, x: 0, y: 0 });
+            pieces.push({ el: piece, type, id, placed: false, x: 0, y: 0, required });
             return piece;
           }
 
@@ -238,6 +248,8 @@ components.html(
           createPiece("x-horizontal", "x-horizontal", "5x", "가로로 긴 5x 직사각형");
           createPiece("x-vertical", "x-vertical", "5x", "세로로 긴 5x 직사각형");
           createPiece("square25", "square25", "25", "넓이가 25인 정사각형");
+          createPiece("square9", "square9", "9", "넓이가 9인 오답 정사각형", false);
+          createPiece("square36", "square36", "36", "넓이가 36인 오답 정사각형", false);
 
           function cellsFor(piece, x, y) {
             const cells = [];
@@ -253,9 +265,10 @@ components.html(
               for (let row = 0; row < 5; row++) {
                 for (let col = 0; col < 4; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
-            } else if (piece.type === "square25") {
-              for (let row = 0; row < 5; row++) {
-                for (let col = 0; col < 5; col++) cells.push(`${x + col * unit},${y + row * unit}`);
+            } else {
+              const side = piece.type === "square9" ? 3 : piece.type === "square36" ? 6 : 5;
+              for (let row = 0; row < side; row++) {
+                for (let col = 0; col < side; col++) cells.push(`${x + col * unit},${y + row * unit}`);
               }
             }
             return cells;
@@ -265,7 +278,8 @@ components.html(
             if (piece.type === "x2") return { width: 4 * unit, height: 4 * unit };
             if (piece.type === "x-horizontal") return { width: 5 * unit, height: 4 * unit };
             if (piece.type === "x-vertical") return { width: 4 * unit, height: 5 * unit };
-            return { width: 5 * unit, height: 5 * unit };
+            const side = piece.type === "square9" ? 3 : piece.type === "square36" ? 6 : 5;
+            return { width: side * unit, height: side * unit };
           }
 
           function validPlacement(piece, x, y) {
@@ -292,22 +306,26 @@ components.html(
           }
 
           function updateEquation() {
-            const placedCount = pieces.filter(piece => piece.placed).length;
+            const placedCount = pieces.filter(piece => piece.required && piece.placed).length;
             progressText.textContent = `${placedCount} / 4 조각`;
             progressBar.style.width = `${(placedCount / 4) * 100}%`;
 
             const x2Placed = pieces.some(piece => piece.type === "x2" && piece.placed);
             const rectangleCount = pieces.filter(piece => piece.type.startsWith("x-") && piece.placed).length;
             const square25Placed = pieces.some(piece => piece.type === "square25" && piece.placed);
+            const distractorAreas = pieces
+              .filter(piece => !piece.required && piece.placed)
+              .map(piece => piece.type === "square9" ? 9 : 36);
             const terms = [];
             if (x2Placed) terms.push('<span class="term-x2">x²</span>');
             if (rectangleCount) terms.push(`<span class="term-x">${rectangleCount * 5}x</span>`);
             if (square25Placed) terms.push('<span class="term-unit">25</span>');
+            for (const area of distractorAreas) terms.push(`<span class="term-distractor">${area}</span>`);
             let areaSum = terms.join(" + ");
 
             const filled = new Set();
             for (const piece of pieces) {
-              if (piece.placed) {
+              if (piece.required && piece.placed) {
                 for (const cell of cellsFor(piece, piece.x, piece.y)) filled.add(cell);
               }
             }
@@ -315,19 +333,26 @@ components.html(
             const isSquareArrangement = coordinates.length > 0
               && Math.max(...coordinates.map(([x]) => x)) - Math.min(...coordinates.map(([x]) => x)) === 8 * unit
               && Math.max(...coordinates.map(([, y]) => y)) - Math.min(...coordinates.map(([, y]) => y)) === 8 * unit;
-            const complete = x2Placed && rectangleCount === 2 && square25Placed
+            const distractorPlaced = distractorAreas.length > 0;
+            const complete = x2Placed && rectangleCount === 2 && square25Placed && !distractorPlaced
               && filled.size === 81
               && isSquareArrangement;
             if (complete) areaSum = "x² + 10x + 25 = 24 + 25";
-            else if (x2Placed && rectangleCount === 2 && !square25Placed) areaSum += " = 24";
+            else if (x2Placed && rectangleCount === 2 && !square25Placed && !distractorPlaced) areaSum += " = 24";
             expression.innerHTML = areaSum || "아직 도형을 배치하지 않았어요";
             expression.classList.toggle("empty", !areaSum);
 
-            statusBadge.textContent = complete ? "정사각형 완성!" : `${placedCount} / 4 조각 배치`;
+            statusBadge.textContent = complete
+              ? "정사각형 완성!"
+              : distractorPlaced
+                ? "이 조각은 필요한 넓이와 달라요"
+                : `${placedCount} / 4 조각 배치`;
             completeMessage.classList.toggle("show", complete);
             revealBtn.disabled = !complete;
             if (!complete) {
+              areaSumPanel.hidden = false;
               solutionPanel.hidden = true;
+              revealBtn.hidden = false;
               revealBtn.textContent = "완전제곱식으로 바꾸기";
               answerChoices.forEach(choice => { choice.checked = false; });
               checkAnswerBtn.disabled = true;
@@ -377,6 +402,20 @@ components.html(
           function endDrag(event) {
             if (!drag) return;
             const { model, wasPlaced } = drag;
+            let rejectedDistractor = false;
+            const trayRect = tray.getBoundingClientRect();
+            const droppedOnTray = event.clientX >= trayRect.left && event.clientX <= trayRect.right
+              && event.clientY >= trayRect.top && event.clientY <= trayRect.bottom;
+            if (droppedOnTray) {
+              model.placed = false;
+              model.el.classList.remove("dragging");
+              model.el.style.cssText = "";
+              tray.appendChild(model.el);
+              choose(null);
+              drag = null;
+              updateEquation();
+              return;
+            }
             const x = Math.round((Number.parseFloat(model.el.style.left) || 0) / unit) * unit;
             const y = Math.round((Number.parseFloat(model.el.style.top) || 0) / unit) * unit;
             model.el.classList.remove("dragging");
@@ -387,6 +426,7 @@ components.html(
               setPosition(model, x, y);
               board.appendChild(model.el);
             } else if (!wasPlaced) {
+              rejectedDistractor = !model.required;
               model.placed = false;
               model.el.classList.remove("selected");
               model.el.style.left = "";
@@ -399,6 +439,7 @@ components.html(
             }
             drag = null;
             updateEquation();
+            if (rejectedDistractor) statusBadge.textContent = "이 사각형은 빈칸의 크기와 맞지 않아요";
           }
 
           document.addEventListener("pointerdown", event => {
@@ -410,8 +451,9 @@ components.html(
           document.addEventListener("pointercancel", endDrag);
 
           revealBtn.addEventListener("click", () => {
-            solutionPanel.hidden = !solutionPanel.hidden;
-            revealBtn.textContent = solutionPanel.hidden ? "완전제곱식으로 바꾸기" : "식 숨기기";
+            areaSumPanel.hidden = true;
+            solutionPanel.hidden = false;
+            revealBtn.hidden = true;
           });
 
           answerChoices.forEach(choice => {
