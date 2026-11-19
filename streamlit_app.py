@@ -151,7 +151,7 @@ components.html(
         <div class="layout">
           <section class="card board-card">
             <div class="section-head">
-              <div><h2>큰 정사각형 만들기</h2><p class="hint" id="activityHint">필요한 네 조각을 골라 판에 끌어 놓아 빈틈없이 채워 보세요. 크기가 다른 도형은 오답 조각이에요.</p></div>
+              <div><h2>큰 정사각형 만들기</h2><p class="hint" id="activityHint">필요한 네조각을 골라 판에 끌어놓으세요. 큰 정사각형을 만들어 이차방정식을 풀어봅시다.</p></div>
             </div>
             <div class="board-stage">
               <div class="board" id="board" aria-label="도형을 배치하는 격자">
