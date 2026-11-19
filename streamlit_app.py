@@ -113,6 +113,7 @@ components.html(
         .expression .term-unit { color: #8fe1c7; }
         .expression .term-distractor { color: #ffaaaa; }
         .expression.result { min-height: 28px; font-size: 17px; color: #d7ddff; }
+        .factorized-equation { min-height: 38px; font-size: 27px !important; color: #fff !important; }
         .formula-divider { height: 1px; margin: 13px 0; background: #ffffff20; }
         #areaSumPanel[hidden], .solution-panel[hidden] { display: none !important; }
         .quiz { margin: 12px 0 0; padding: 12px 0 0; border: 0; border-top: 1px solid #ffffff20; }
@@ -189,8 +190,7 @@ components.html(
               </div>
               <button class="btn primary" id="revealBtn" type="button" disabled>완전제곱식으로 바꾸기</button>
               <div class="solution-panel" id="solutionPanel" hidden>
-                <div class="expression result" id="equationStep">x² + 10x + 25 = 24 + 25</div>
-                <div class="expression result" id="factorized">(x + 5)² = 49</div>
+                <div class="expression result factorized-equation" id="factorized">(x + 5)² = 49</div>
                 <fieldset class="quiz">
                   <legend>원래 방정식의 해를 모두 고른 것은?</legend>
                   <div class="choices">
@@ -481,7 +481,6 @@ components.html(
             areaSumPanel.hidden = true;
             solutionPanel.hidden = false;
             revealBtn.hidden = true;
-            document.getElementById("equationStep").textContent = "x² + 10x + 25 = 24 + 25";
             factorized.textContent = "(x + 5)² = 49";
           });
 
