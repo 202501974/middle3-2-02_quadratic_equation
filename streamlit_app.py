@@ -83,6 +83,7 @@ components.html(
         .tools { display: flex; gap: 8px; margin-top: 13px; }
         .btn { border: 1px solid #dfe5ef; background: white; color: #34425d; border-radius: 10px; padding: 9px 13px; font-size: 12px; font-weight: 700; cursor: pointer; transition: .15s; }
         .btn:hover { background: #f5f7fc; border-color: #bfc9dc; }
+        .btn:disabled { opacity: .45; cursor: not-allowed; }
         .btn.primary { color: white; border-color: #4e61d3; background: #586be0; }
         .btn.primary:hover { background: #495dcf; }
         .side { display: flex; flex-direction: column; gap: 14px; }
@@ -100,6 +101,14 @@ components.html(
         .expression .term-unit { color: #8fe1c7; }
         .expression.result { min-height: 28px; font-size: 17px; color: #d7ddff; }
         .formula-divider { height: 1px; margin: 13px 0; background: #ffffff20; }
+        .solution-panel[hidden] { display: none; }
+        .quiz { margin: 12px 0 0; padding: 12px 0 0; border: 0; border-top: 1px solid #ffffff20; }
+        .quiz legend { padding: 0; color: #dce3ff; font-size: 13px; font-weight: 700; }
+        .choices { display: grid; gap: 7px; margin-top: 10px; }
+        .choice { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border: 1px solid #ffffff24; border-radius: 9px; color: #e4e9f8; font-size: 13px; cursor: pointer; }
+        .choice:has(input:checked) { border-color: #9eabff; background: #ffffff12; }
+        .choice input { accent-color: #9eabff; }
+        .answer-feedback { min-height: 20px; margin: 8px 0 0; color: #a7e6cb; font-size: 12px; font-weight: 700; }
         .progress-wrap { margin-top: 15px; }
         .progress-info { display: flex; justify-content: space-between; color: #b9c4df; font-size: 11px; margin-bottom: 7px; }
         .progress { height: 7px; border-radius: 10px; background: #ffffff20; overflow: hidden; }
@@ -163,9 +172,22 @@ components.html(
               <div class="equation-label">현재 배치한 도형의 넓이 합</div>
               <div class="expression empty" id="expression" aria-live="polite">아직 배치한 도형이 없어요</div>
               <div class="formula-divider"></div>
-              <div class="equation-label">완성제곱식으로 바꾸기</div>
-              <div class="expression result" id="equationStep">퍼즐을 완성하면 식이 나타나요</div>
-              <div class="expression result" id="factorized"></div>
+              <button class="btn primary" id="revealBtn" type="button" disabled>완전제곱식으로 바꾸기</button>
+              <div class="solution-panel" id="solutionPanel" hidden>
+                <div class="expression result" id="equationStep">(x + 5)² = 49</div>
+                <fieldset class="quiz">
+                  <legend>원래 방정식의 해를 모두 고른 것은?</legend>
+                  <div class="choices">
+                    <label class="choice"><input type="radio" name="answer" value="minus12"> x = -12만</label>
+                    <label class="choice"><input type="radio" name="answer" value="plusminus5"> x = -5 또는 x = 5</label>
+                    <label class="choice"><input type="radio" name="answer" value="both"> x = 2 또는 x = -12</label>
+                    <label class="choice"><input type="radio" name="answer" value="plusminus7"> x = -7 또는 x = 7</label>
+                    <label class="choice"><input type="radio" name="answer" value="two"> x = 2만</label>
+                  </div>
+                </fieldset>
+                <button class="btn" id="checkAnswerBtn" type="button" disabled>정답 확인</button>
+                <p class="answer-feedback" id="answerFeedback" aria-live="polite"></p>
+              </div>
               <div class="progress-wrap">
                 <div class="progress-info"><span>퍼즐 완성도</span><span id="progressText">0 / 4 조각</span></div>
                 <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
@@ -174,7 +196,7 @@ components.html(
             <section class="card goal-card">
               <h2>오늘의 발견</h2>
               <p>비어 있는 모서리는 한 변이 5인 정사각형이에요. 단위 넓이로는 <b>5 × 5 = 25</b>이므로 양변에 25를 더하면 식이 완전제곱식이 됩니다.</p>
-              <div class="complete-message" id="completeMessage">🎉 완성! x² + 10x + 25 = 24 + 25<br>(x + 5)² = 49</div>
+              <div class="complete-message" id="completeMessage">🎉 큰 정사각형을 완성했어요! 오른쪽 버튼을 눌러 식을 확인해 보세요.</div>
             </section>
           </aside>
         </div>
@@ -188,8 +210,11 @@ components.html(
           const progressBar = document.getElementById("progressBar");
           const statusBadge = document.getElementById("statusBadge");
           const completeMessage = document.getElementById("completeMessage");
-          const equationStep = document.getElementById("equationStep");
-          const factorized = document.getElementById("factorized");
+          const revealBtn = document.getElementById("revealBtn");
+          const solutionPanel = document.getElementById("solutionPanel");
+          const checkAnswerBtn = document.getElementById("checkAnswerBtn");
+          const answerFeedback = document.getElementById("answerFeedback");
+          const answerChoices = [...document.querySelectorAll('input[name="answer"]')];
           const unit = 28;
           const pieces = [];
           let selected = null;
@@ -279,9 +304,6 @@ components.html(
             if (rectangleCount) terms.push(`<span class="term-x">${rectangleCount * 5}x</span>`);
             if (square25Placed) terms.push('<span class="term-unit">25</span>');
             let areaSum = terms.join(" + ");
-            if (x2Placed && rectangleCount === 2 && !square25Placed) areaSum += " = 24";
-            expression.innerHTML = areaSum || "아직 도형을 배치하지 않았어요";
-            expression.classList.toggle("empty", !areaSum);
 
             const filled = new Set();
             for (const piece of pieces) {
@@ -296,10 +318,21 @@ components.html(
             const complete = x2Placed && rectangleCount === 2 && square25Placed
               && filled.size === 81
               && isSquareArrangement;
+            if (complete) areaSum = "x² + 10x + 25 = 24 + 25";
+            else if (x2Placed && rectangleCount === 2 && !square25Placed) areaSum += " = 24";
+            expression.innerHTML = areaSum || "아직 도형을 배치하지 않았어요";
+            expression.classList.toggle("empty", !areaSum);
+
             statusBadge.textContent = complete ? "정사각형 완성!" : `${placedCount} / 4 조각 배치`;
             completeMessage.classList.toggle("show", complete);
-            equationStep.textContent = complete ? "x² + 10x + 25 = 24 + 25" : "모든 조각이 서로 붙으면 등식이 완성돼요";
-            factorized.textContent = complete ? "(x + 5)² = 49" : "";
+            revealBtn.disabled = !complete;
+            if (!complete) {
+              solutionPanel.hidden = true;
+              revealBtn.textContent = "완전제곱식으로 바꾸기";
+              answerChoices.forEach(choice => { choice.checked = false; });
+              checkAnswerBtn.disabled = true;
+              answerFeedback.textContent = "";
+            }
           }
 
           function startDrag(event, piece) {
@@ -375,6 +408,26 @@ components.html(
           document.addEventListener("pointermove", moveDrag);
           document.addEventListener("pointerup", endDrag);
           document.addEventListener("pointercancel", endDrag);
+
+          revealBtn.addEventListener("click", () => {
+            solutionPanel.hidden = !solutionPanel.hidden;
+            revealBtn.textContent = solutionPanel.hidden ? "완전제곱식으로 바꾸기" : "식 숨기기";
+          });
+
+          answerChoices.forEach(choice => {
+            choice.addEventListener("change", () => {
+              checkAnswerBtn.disabled = false;
+              answerFeedback.textContent = "";
+            });
+          });
+
+          checkAnswerBtn.addEventListener("click", () => {
+            const selectedAnswer = answerChoices.find(choice => choice.checked);
+            if (!selectedAnswer) return;
+            answerFeedback.textContent = selectedAnswer.value === "both"
+              ? "정답이에요! x = 2 또는 x = -12입니다."
+              : "다시 생각해 보세요. 제곱근을 풀 때 ± 두 경우를 모두 확인해요.";
+          });
 
           document.getElementById("resetBtn").addEventListener("click", () => {
             for (const piece of pieces) {
