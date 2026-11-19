@@ -59,7 +59,8 @@ components.html(
           touch-action: none; overflow: visible;
         }
         .piece {
-          position: absolute; display: grid; place-items: center; border: 2px solid #fff;
+          position: absolute; width: var(--piece-width); height: var(--piece-height);
+          display: grid; place-items: center; border: 2px solid #fff;
           border-radius: 8px; cursor: grab; user-select: none; touch-action: none;
           box-shadow: none; transition: left .07s linear, top .07s linear, filter .12s;
           z-index: 2; font-weight: 800;
@@ -68,30 +69,15 @@ components.html(
         .piece.selected { outline: none; box-shadow: inset 0 0 0 3px #293d72; z-index: 5; }
         .piece.dragging { opacity: .88; box-shadow: none; z-index: 10; }
         .board .piece.dragging { z-index: 20; }
-        .piece-x2 { width: 84px; height: 84px; background: #7d8df1; color: white; font-size: 20px; }
-        .piece-x-horizontal { width: 140px; height: 84px; background: #ffbf66; color: #653e08; font-size: 14px; }
-        .piece-x-vertical { width: 84px; height: 140px; background: #f0ad50; color: #653e08; font-size: 14px; }
-        .piece-x4-horizontal { width: 112px; height: 84px; background: #f2a979; color: #663b22; font-size: 13px; }
-        .piece-x4-vertical { width: 84px; height: 112px; background: #e89a70; color: #663b22; font-size: 13px; }
-        .piece-x6-horizontal { width: 168px; height: 84px; background: #e58b82; color: #642f2a; font-size: 13px; }
-        .piece-x6-vertical { width: 84px; height: 168px; background: #d97770; color: #642f2a; font-size: 13px; }
-        .piece-square25 { width: 140px; height: 140px; background: #69c9ad; color: #155945; font-size: 16px; }
-        .piece-square16 { width: 112px; height: 112px; background: #ec9b9b; color: #6a3030; font-size: 16px; }
-        .piece-square36 { width: 168px; height: 168px; background: #d7a3d8; color: #563458; font-size: 16px; }
+        .piece-x2 { background: #7d8df1; color: white; font-size: 20px; }
+        .piece-x-horizontal, .piece-x-vertical { background: #ffbf66; color: #653e08; font-size: 14px; }
+        .piece-distractor-rect { background: #e58b82; color: #642f2a; font-size: 13px; }
+        .piece-square { background: #69c9ad; color: #155945; font-size: 16px; }
+        .piece-distractor-square { background: #d7a3d8; color: #563458; font-size: 16px; }
         .tray { min-height: 150px; padding: 12px; border-radius: 12px; background: #f7f8fc; border: 1px solid #edf0f6; }
         .tray-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: #78849a; font-size: 12px; font-weight: 700; }
         .tray-pieces { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; min-height: 74px; }
-        .tray .piece { position: relative; inset: auto !important; flex: 0 0 auto; }
-        .tray .piece-x2 { width: 42px; height: 42px; font-size: 13px; }
-        .tray .piece-x-horizontal { width: 70px; height: 42px; font-size: 11px; }
-        .tray .piece-x-vertical { width: 42px; height: 70px; font-size: 11px; }
-        .tray .piece-x4-horizontal { width: 56px; height: 42px; font-size: 10px; }
-        .tray .piece-x4-vertical { width: 42px; height: 56px; font-size: 10px; }
-        .tray .piece-x6-horizontal { width: 84px; height: 42px; font-size: 10px; }
-        .tray .piece-x6-vertical { width: 42px; height: 84px; font-size: 10px; }
-        .tray .piece-square25 { width: 70px; height: 70px; font-size: 14px; }
-        .tray .piece-square16 { width: 56px; height: 56px; font-size: 12px; }
-        .tray .piece-square36 { width: 84px; height: 84px; font-size: 12px; }
+        .tray .piece { position: relative; inset: auto !important; flex: 0 0 auto; width: calc(var(--piece-width) / 2); height: calc(var(--piece-height) / 2); font-size: 11px; }
         .tray-feedback { min-height: 18px; margin: 8px 0 0; color: #9c5960; font-size: 11px; }
         .tools { display: flex; gap: 8px; margin-top: 13px; }
         .btn { border: 1px solid #dfe5ef; background: white; color: #34425d; border-radius: 10px; padding: 9px 13px; font-size: 12px; font-weight: 700; cursor: pointer; transition: .15s; }
@@ -151,20 +137,20 @@ components.html(
         <h1>완전제곱식 퍼즐</h1>
         <p class="intro">도형을 옮겨 큰 정사각형을 만들어 보세요. 조각을 놓을 때마다 넓이의 식이 바뀝니다.</p>
         <section class="problem-card" aria-label="오늘의 문제">
-          <div><div class="problem-label">오늘의 문제</div><div class="problem-expression">x² + 10x = 24</div></div>
+          <div><div class="problem-label" id="problemLabel">오늘의 문제</div><div class="problem-expression" id="problemExpression">x² + 10x = 24</div></div>
         </section>
 
         <div class="layout">
           <section class="card board-card">
             <div class="section-head">
-              <div><h2>큰 정사각형 만들기</h2><p class="hint">필요한 네 조각을 골라 판에 끌어 놓아 빈틈없이 채워 보세요. 크기가 다른 도형은 오답 조각이에요.</p></div>
+              <div><h2>큰 정사각형 만들기</h2><p class="hint" id="activityHint">필요한 네 조각을 골라 판에 끌어 놓아 빈틈없이 채워 보세요. 크기가 다른 도형은 오답 조각이에요.</p></div>
             </div>
             <div class="board-stage">
               <div class="board" id="board" aria-label="도형을 배치하는 격자">
               </div>
             </div>
             <div class="tray">
-              <div class="tray-title"><span>도형 조각</span><span>필수: x² · 5x 가로/세로 · 25 / 오답: 4x·6x 가로/세로, 16·36</span></div>
+              <div class="tray-title"><span>도형 조각</span><span id="trayDescription"></span></div>
               <div class="tray-pieces" id="tray"></div>
               <p class="tray-feedback" id="trayFeedback" aria-live="polite"></p>
             </div>
@@ -177,8 +163,8 @@ components.html(
             <section class="card lesson-card">
               <h2>활동 방법</h2>
               <div class="step"><span class="step-num">1</span><p><b>x²</b> 타일을 큰 정사각형의 한쪽 모서리에 놓으세요.</p></div>
-              <div class="step"><span class="step-num">2</span><p><b>가로 5x</b>와 <b>세로 5x</b> 조각을 x² 타일의 두 변에 붙여 보세요.</p></div>
-              <div class="step"><span class="step-num">3</span><p>남은 <b>5 × 5</b> 모서리를 <b>25</b> 정사각형으로 채워 보세요.</p></div>
+              <div class="step"><span class="step-num">2</span><p id="rectangleInstruction"><b>가로 5x</b>와 <b>세로 5x</b> 조각을 x² 타일의 두 변에 붙여 보세요.</p></div>
+              <div class="step"><span class="step-num">3</span><p id="squareInstruction">남은 <b>5 × 5</b> 모서리를 <b>25</b> 정사각형으로 채워 보세요.</p></div>
             </section>
             <section class="card equation-card">
               <h2>도형의 넓이 식</h2>
@@ -192,13 +178,7 @@ components.html(
                 <div class="expression result factorized-equation" id="factorized">(x + 5)² = 49</div>
                 <fieldset class="quiz">
                   <legend>원래 방정식의 해를 모두 고른 것은?</legend>
-                  <div class="choices">
-                    <label class="choice"><input type="radio" name="answer" value="minus12"> x = -12만</label>
-                    <label class="choice"><input type="radio" name="answer" value="plusminus5"> x = -5 또는 x = 5</label>
-                    <label class="choice"><input type="radio" name="answer" value="both"> x = 2 또는 x = -12</label>
-                    <label class="choice"><input type="radio" name="answer" value="plusminus7"> x = -7 또는 x = 7</label>
-                    <label class="choice"><input type="radio" name="answer" value="two"> x = 2만</label>
-                  </div>
+                  <div class="choices" id="choices"></div>
                 </fieldset>
                 <button class="btn" id="checkAnswerBtn" type="button" disabled>정답 확인</button>
                 <p class="answer-feedback" id="answerFeedback" aria-live="polite"></p>
@@ -210,14 +190,9 @@ components.html(
             </section>
             <section class="card goal-card">
               <h2>이차방정식 풀이 과정</h2>
-              <div class="solving-steps" id="processHint">x² + 10x = 24</div>
-              <div class="solving-steps" id="solvingSteps" hidden>
-                <div>x² + 10x = 24</div>
-                <div>x² + 10x + 25 = 24 + 25</div>
-                <div>(x + 5)² = 49</div>
-                <div>x + 5 = ±7</div>
-                <div>x = 2 또는 x = -12</div>
-              </div>
+              <div class="solving-steps" id="processHint"></div>
+              <div class="solving-steps" id="solvingSteps" hidden></div>
+              <button class="btn primary" id="nextProblemBtn" type="button" hidden>다른 문제 풀기</button>
             </section>
           </aside>
         </div>
@@ -238,86 +213,176 @@ components.html(
           const factorized = document.getElementById("factorized");
           const checkAnswerBtn = document.getElementById("checkAnswerBtn");
           const answerFeedback = document.getElementById("answerFeedback");
-          const answerChoices = [...document.querySelectorAll('input[name="answer"]')];
+          const choices = document.getElementById("choices");
+          const problemExpression = document.getElementById("problemExpression");
+          const problemLabel = document.getElementById("problemLabel");
+          const trayDescription = document.getElementById("trayDescription");
+          const rectangleInstruction = document.getElementById("rectangleInstruction");
+          const squareInstruction = document.getElementById("squareInstruction");
+          const nextProblemBtn = document.getElementById("nextProblemBtn");
           const unit = 28;
           const pieces = [];
+          const problems = [
+            { coefficient: 5, rightSide: 24 },
+            { coefficient: 4, rightSide: 9 }
+          ];
+          let problemIndex = 0;
+          let problem = problems[problemIndex];
           let selected = null;
           let drag = null;
 
-          function createPiece(type, id, label, description, required = true) {
+          function createPiece({ type, id, label, description, columns, rows, required = true, term }) {
             const piece = document.createElement("div");
             piece.className = `piece piece-${type}`;
-            piece.dataset.type = type;
-            piece.dataset.id = id;
             piece.textContent = label;
             piece.setAttribute("role", "button");
             piece.setAttribute("aria-label", description);
             piece.tabIndex = 0;
+            setPieceSize(piece, columns, rows);
             tray.appendChild(piece);
-            pieces.push({ el: piece, type, id, placed: false, x: 0, y: 0, required });
+            pieces.push({ el: piece, type, id, columns, rows, required, term, placed: false, x: 0, y: 0 });
             return piece;
           }
 
-          createPiece("x2", "x2", "x²", "x 제곱 정사각형");
-          createPiece("x-horizontal", "x-horizontal", "5x", "가로로 긴 5x 직사각형");
-          createPiece("x-vertical", "x-vertical", "5x", "세로로 긴 5x 직사각형");
-          createPiece("square25", "square25", "25", "넓이가 25인 정사각형");
-          createPiece("x4-horizontal", "x4-horizontal", "4x", "가로로 긴 4x 오답 직사각형", false);
-          createPiece("x4-vertical", "x4-vertical", "4x", "세로로 긴 4x 오답 직사각형", false);
-          createPiece("x6-horizontal", "x6-horizontal", "6x", "가로로 긴 6x 오답 직사각형", false);
-          createPiece("x6-vertical", "x6-vertical", "6x", "세로로 긴 6x 오답 직사각형", false);
-          createPiece("square16", "square16", "16", "넓이가 16인 오답 정사각형", false);
-          createPiece("square36", "square36", "36", "넓이가 36인 오답 정사각형", false);
+          function setPieceSize(piece, columns, rows) {
+            piece.style.setProperty("--piece-width", `${columns * unit}px`);
+            piece.style.setProperty("--piece-height", `${rows * unit}px`);
+          }
+
+          function buildPieces() {
+            const a = problem.coefficient;
+            const wrongCoefficients = [a - 1, a + 1];
+            const wrongSquares = [a - 1, a + 1];
+            pieces.length = 0;
+            tray.replaceChildren();
+            board.replaceChildren();
+            createPiece({ type: "x2", id: "x2", label: "x²", description: "x 제곱 정사각형", columns: 3, rows: 3, term: "x²" });
+            createPiece({ type: "x-horizontal", id: "x-horizontal", label: `${a}x`, description: `가로로 긴 ${a}x 직사각형`, columns: a, rows: 3, term: `${a}x` });
+            createPiece({ type: "x-vertical", id: "x-vertical", label: `${a}x`, description: `세로로 긴 ${a}x 직사각형`, columns: 3, rows: a, term: `${a}x` });
+            createPiece({ type: "square", id: "square-correct", label: `${a * a}`, description: `넓이가 ${a * a}인 정사각형`, columns: a, rows: a, term: `${a * a}` });
+            for (const coefficient of wrongCoefficients) {
+              for (const direction of ["horizontal", "vertical"]) {
+                createPiece({
+                  type: "distractor-rect",
+                  id: `rect-${coefficient}-${direction}`,
+                  label: `${coefficient}x`,
+                  description: `${direction === "horizontal" ? "가로" : "세로"}로 긴 ${coefficient}x 오답 직사각형`,
+                  columns: direction === "horizontal" ? coefficient : 3,
+                  rows: direction === "horizontal" ? 3 : coefficient,
+                  required: false,
+                  term: `${coefficient}x`
+                });
+              }
+            }
+            for (const side of wrongSquares) {
+              createPiece({
+                type: "distractor-square",
+                id: `square-${side * side}`,
+                label: `${side * side}`,
+                description: `넓이가 ${side * side}인 오답 정사각형`,
+                columns: side,
+                rows: side,
+                required: false,
+                term: `${side * side}`
+              });
+            }
+            trayDescription.textContent = `필수: x² · ${a}x 가로/세로 · ${a * a} / 오답: ${wrongCoefficients[0]}x·${wrongCoefficients[1]}x 가로/세로, ${wrongSquares[0] ** 2}·${wrongSquares[1] ** 2}`;
+            rectangleInstruction.innerHTML = `<b>가로 ${a}x</b>와 <b>세로 ${a}x</b> 조각을 x² 타일의 두 변에 붙여 보세요.`;
+            squareInstruction.innerHTML = `남은 <b>${a} × ${a}</b> 모서리를 <b>${a * a}</b> 정사각형으로 채워 보세요.`;
+            problemExpression.textContent = `x² + ${2 * a}x = ${problem.rightSide}`;
+            problemLabel.textContent = problemIndex === 0 ? "오늘의 문제" : "도전 문제";
+            processHint.textContent = `x² + ${2 * a}x = ${problem.rightSide}`;
+            solvingSteps.innerHTML = "";
+            answerChoicesMarkup();
+          }
+
+          function answerChoicesMarkup() {
+            const a = problem.coefficient;
+            const root = Math.sqrt(a * a + problem.rightSide);
+            const firstRoot = -a + root;
+            const secondRoot = -a - root;
+            const formatRoot = value => `${value}`;
+            const options = [
+              { value: "first-only", label: `x = ${firstRoot}만` },
+              { value: "opposite-pair", label: `x = -${a} 또는 x = ${a}` },
+              { value: "both", label: `x = ${firstRoot} 또는 x = ${secondRoot}` },
+              { value: "root-pair", label: `x = ${-a - root - 1} 또는 x = ${-a + root + 1}` },
+              { value: "second-only", label: `x = ${secondRoot}만` }
+            ];
+            choices.replaceChildren();
+            for (const option of options) {
+              const label = document.createElement("label");
+              label.className = "choice";
+              const input = document.createElement("input");
+              input.type = "radio";
+              input.name = "answer";
+              input.value = option.value;
+              input.addEventListener("change", () => {
+                checkAnswerBtn.disabled = false;
+                answerFeedback.textContent = "";
+                solvingSteps.hidden = true;
+                nextProblemBtn.hidden = true;
+              });
+              label.append(input, document.createTextNode(` ${option.label}`));
+              choices.appendChild(label);
+            }
+            buildSolvingSteps(root, firstRoot, secondRoot, formatRoot);
+          }
+
+          function buildSolvingSteps(root, firstRoot, secondRoot, formatRoot) {
+            const a = problem.coefficient;
+            const rightSide = problem.rightSide;
+            solvingSteps.innerHTML = [
+              `x² + ${2 * a}x = ${rightSide}`,
+              `x² + ${2 * a}x + ${a * a} = ${rightSide} + ${a * a}`,
+              `(x + ${a})² = ${a * a + rightSide}`,
+              `x + ${a} = ±${root}`,
+              `x = ${formatRoot(firstRoot)} 또는 x = ${formatRoot(secondRoot)}`
+            ].map(step => `<div>${step}</div>`).join("");
+          }
+
+          function answerChoicesList() {
+            return [...choices.querySelectorAll('input[name="answer"]')];
+          }
+
+          function setupProblem() {
+            problem = problems[problemIndex];
+            const a = problem.coefficient;
+            const rightSide = problem.rightSide;
+            problemExpression.textContent = `x² + ${2 * a}x = ${rightSide}`;
+            problemLabel.textContent = problemIndex === 0 ? "오늘의 문제" : "도전 문제";
+            processHint.textContent = `x² + ${2 * a}x = ${rightSide}`;
+            factorized.textContent = `(x + ${a})² = ${a * a + rightSide}`;
+            trayDescription.textContent = `필수: x² · ${a}x 가로/세로 · ${a * a} / 오답: ${a - 1}x·${a + 1}x 가로/세로, ${(a - 1) ** 2}·${(a + 1) ** 2}`;
+            rectangleInstruction.innerHTML = `<b>가로 ${a}x</b>와 <b>세로 ${a}x</b> 조각을 x² 타일의 두 변에 붙여 보세요.`;
+            squareInstruction.innerHTML = `남은 <b>${a} × ${a}</b> 모서리를 <b>${a * a}</b> 정사각형으로 채워 보세요.`;
+            nextProblemBtn.hidden = true;
+            areaSumPanel.hidden = false;
+            solutionPanel.hidden = true;
+            revealBtn.hidden = false;
+            revealBtn.disabled = true;
+            revealBtn.textContent = "완전제곱식으로 바꾸기";
+            processHint.hidden = false;
+            solvingSteps.hidden = true;
+            checkAnswerBtn.disabled = true;
+            answerFeedback.textContent = "";
+            trayFeedback.textContent = "";
+            buildPieces();
+            updateEquation();
+          }
 
           function cellsFor(piece, x, y) {
             const cells = [];
-            if (piece.type === "x2") {
-              for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 3; col++) cells.push(`${x + col * unit},${y + row * unit}`);
-              }
-            } else if (piece.type === "x-horizontal") {
-              for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 5; col++) cells.push(`${x + col * unit},${y + row * unit}`);
-              }
-            } else if (piece.type === "x-vertical") {
-              for (let row = 0; row < 5; row++) {
-                for (let col = 0; col < 3; col++) cells.push(`${x + col * unit},${y + row * unit}`);
-              }
-            } else if (piece.type === "x4-horizontal") {
-              for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 4; col++) cells.push(`${x + col * unit},${y + row * unit}`);
-              }
-            } else if (piece.type === "x4-vertical") {
-              for (let row = 0; row < 4; row++) {
-                for (let col = 0; col < 3; col++) cells.push(`${x + col * unit},${y + row * unit}`);
-              }
-            } else if (piece.type === "x6-horizontal") {
-              for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 6; col++) cells.push(`${x + col * unit},${y + row * unit}`);
-              }
-            } else if (piece.type === "x6-vertical") {
-              for (let row = 0; row < 6; row++) {
-                for (let col = 0; col < 3; col++) cells.push(`${x + col * unit},${y + row * unit}`);
-              }
-            } else {
-              const side = piece.type === "square16" ? 4 : piece.type === "square36" ? 6 : 5;
-              for (let row = 0; row < side; row++) {
-                for (let col = 0; col < side; col++) cells.push(`${x + col * unit},${y + row * unit}`);
+            for (let row = 0; row < piece.rows; row++) {
+              for (let col = 0; col < piece.columns; col++) {
+                cells.push(`${x + col * unit},${y + row * unit}`);
               }
             }
             return cells;
           }
 
           function dimensions(piece) {
-            if (piece.type === "x2") return { width: 3 * unit, height: 3 * unit };
-            if (piece.type === "x-horizontal") return { width: 5 * unit, height: 3 * unit };
-            if (piece.type === "x-vertical") return { width: 3 * unit, height: 5 * unit };
-            if (piece.type === "x4-horizontal") return { width: 4 * unit, height: 3 * unit };
-            if (piece.type === "x4-vertical") return { width: 3 * unit, height: 4 * unit };
-            if (piece.type === "x6-horizontal") return { width: 6 * unit, height: 3 * unit };
-            if (piece.type === "x6-vertical") return { width: 3 * unit, height: 6 * unit };
-            const side = piece.type === "square16" ? 4 : piece.type === "square36" ? 6 : 5;
-            return { width: side * unit, height: side * unit };
+            return { width: piece.columns * unit, height: piece.rows * unit };
           }
 
           function setPosition(piece, x, y) {
@@ -337,23 +402,16 @@ components.html(
             progressText.textContent = `${placedCount} / 4 조각`;
             progressBar.style.width = `${(placedCount / 4) * 100}%`;
 
-            const x2Placed = pieces.some(piece => piece.type === "x2" && piece.placed);
-            const rectangleCount = pieces.filter(piece => piece.type.startsWith("x-") && piece.placed).length;
-            const square25Placed = pieces.some(piece => piece.type === "square25" && piece.placed);
+            const x2Placed = pieces.some(piece => piece.required && piece.type === "x2" && piece.placed);
+            const rectangleCount = pieces.filter(piece => piece.required && piece.type.startsWith("x-") && piece.placed).length;
+            const squarePlaced = pieces.some(piece => piece.required && piece.type === "square" && piece.placed);
             const distractorAreas = pieces
               .filter(piece => !piece.required && piece.placed)
-              .map(piece => ({
-                "x4-horizontal": 12,
-                "x4-vertical": 12,
-                "x6-horizontal": 18,
-                "x6-vertical": 18,
-                square16: 16,
-                square36: 36
-              }[piece.type]));
+              .map(piece => piece.term);
             const terms = [];
             if (x2Placed) terms.push('<span class="term-x2">x²</span>');
-            if (rectangleCount) terms.push(`<span class="term-x">${rectangleCount * 5}x</span>`);
-            if (square25Placed) terms.push('<span class="term-unit">25</span>');
+            if (rectangleCount) terms.push(`<span class="term-x">${rectangleCount * problem.coefficient}x</span>`);
+            if (squarePlaced) terms.push(`<span class="term-unit">${problem.coefficient ** 2}</span>`);
             for (const area of distractorAreas) terms.push(`<span class="term-distractor">${area}</span>`);
             let areaSum = terms.join(" + ");
 
@@ -364,15 +422,16 @@ components.html(
               }
             }
             const coordinates = [...filled].map(cell => cell.split(",").map(Number));
+            const targetSide = problem.coefficient + 3;
             const isSquareArrangement = coordinates.length > 0
-              && Math.max(...coordinates.map(([x]) => x)) - Math.min(...coordinates.map(([x]) => x)) === 7 * unit
-              && Math.max(...coordinates.map(([, y]) => y)) - Math.min(...coordinates.map(([, y]) => y)) === 7 * unit;
+              && Math.max(...coordinates.map(([x]) => x)) - Math.min(...coordinates.map(([x]) => x)) === (targetSide - 1) * unit
+              && Math.max(...coordinates.map(([, y]) => y)) - Math.min(...coordinates.map(([, y]) => y)) === (targetSide - 1) * unit;
             const distractorPlaced = distractorAreas.length > 0;
-            const complete = x2Placed && rectangleCount === 2 && square25Placed && !distractorPlaced
-              && filled.size === 64
+            const complete = x2Placed && rectangleCount === 2 && squarePlaced && !distractorPlaced
+              && filled.size === targetSide ** 2
               && isSquareArrangement;
-            if (complete) areaSum = "x² + 10x + 25 = 24 + 25";
-            else if (x2Placed && rectangleCount === 2 && !square25Placed && !distractorPlaced) areaSum += " = 24";
+            if (complete) areaSum = `x² + ${2 * problem.coefficient}x + ${problem.coefficient ** 2} = ${problem.rightSide} + ${problem.coefficient ** 2}`;
+            else if (x2Placed && rectangleCount === 2 && !squarePlaced && !distractorPlaced) areaSum += ` = ${problem.rightSide}`;
             expression.innerHTML = areaSum || "아직 도형을 배치하지 않았어요";
             expression.classList.toggle("empty", !areaSum);
 
@@ -385,7 +444,8 @@ components.html(
               revealBtn.textContent = "완전제곱식으로 바꾸기";
               processHint.hidden = false;
               solvingSteps.hidden = true;
-              answerChoices.forEach(choice => { choice.checked = false; });
+              nextProblemBtn.hidden = true;
+              answerChoicesList().forEach(choice => { choice.checked = false; });
               checkAnswerBtn.disabled = true;
               answerFeedback.textContent = "";
             }
@@ -442,6 +502,7 @@ components.html(
               model.placed = false;
               model.el.classList.remove("dragging");
               model.el.style.cssText = "";
+              setPieceSize(model.el, model.columns, model.rows);
               tray.appendChild(model.el);
               choose(null);
               drag = null;
@@ -490,24 +551,23 @@ components.html(
             revealBtn.hidden = true;
             processHint.hidden = true;
             solvingSteps.hidden = true;
-            factorized.textContent = "(x + 5)² = 49";
-          });
-
-          answerChoices.forEach(choice => {
-            choice.addEventListener("change", () => {
-              checkAnswerBtn.disabled = false;
-              answerFeedback.textContent = "";
-              solvingSteps.hidden = true;
-            });
           });
 
           checkAnswerBtn.addEventListener("click", () => {
-            const selectedAnswer = answerChoices.find(choice => choice.checked);
+            const selectedAnswer = answerChoicesList().find(choice => choice.checked);
             if (!selectedAnswer) return;
-            answerFeedback.textContent = selectedAnswer.value === "both"
-              ? "정답이에요! x = 2 또는 x = -12입니다."
+            const correct = selectedAnswer.value === "both";
+            answerFeedback.textContent = correct
+              ? `정답이에요! ${solvingSteps.lastElementChild.textContent}`
               : "다시 생각해 보세요. 제곱근을 풀 때 ± 두 경우를 모두 확인해요.";
             solvingSteps.hidden = false;
+            nextProblemBtn.hidden = !correct || problemIndex !== 0;
+          });
+
+          nextProblemBtn.addEventListener("click", () => {
+            if (problemIndex !== 0) return;
+            problemIndex = 1;
+            setupProblem();
           });
 
           document.getElementById("resetBtn").addEventListener("click", () => {
@@ -515,6 +575,7 @@ components.html(
               piece.placed = false;
               piece.el.classList.remove("selected", "dragging");
               piece.el.style.cssText = "";
+              setPieceSize(piece.el, piece.columns, piece.rows);
               tray.appendChild(piece.el);
             }
             choose(null);
@@ -522,7 +583,7 @@ components.html(
             updateEquation();
           });
 
-          updateEquation();
+          setupProblem();
         })();
       </script>
     </body>
