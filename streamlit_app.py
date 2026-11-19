@@ -226,7 +226,11 @@ components.html(
             { coefficient: 6, rightSide: 13 },
             { coefficient: 7, rightSide: 32 },
             { coefficient: 8, rightSide: 17 },
-            { coefficient: 2, rightSide: 21 }
+            { coefficient: 2, rightSide: 21 },
+            { coefficient: 9, rightSide: 19 },
+            { coefficient: 8, rightSide: 57 },
+            { coefficient: 7, rightSide: 51 },
+            { coefficient: 6, rightSide: 28 }
           ];
           let problemIndex = 0;
           let problem = problems[problemIndex];
