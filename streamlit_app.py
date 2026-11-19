@@ -70,11 +70,16 @@ components.html(
         .piece.dragging { opacity: .88; box-shadow: none; z-index: 10; }
         .board .piece.dragging { z-index: 20; }
         .piece-x2 { background: #7d8df1; color: white; font-size: 20px; }
-        .piece-x-horizontal, .piece-x-vertical, .piece-distractor-rect {
-          filter: hue-rotate(var(--rectangle-color-shift, 0deg));
+        .piece-x-horizontal, .piece-x-vertical {
+          background: hsl(var(--rectangle-color-hue, 35deg) 75% 78%);
+          background: oklch(82% 0.1 var(--rectangle-color-hue, 35deg));
+          color: #413631; font-size: 14px;
         }
-        .piece-x-horizontal, .piece-x-vertical { background: #ffbf66; color: #653e08; font-size: 14px; }
-        .piece-distractor-rect { background: #e58b82; color: #642f2a; font-size: 13px; }
+        .piece-distractor-rect {
+          background: hsl(calc(var(--rectangle-color-hue, 35deg) - 29deg) 75% 78%);
+          background: oklch(82% 0.1 calc(var(--rectangle-color-hue, 35deg) - 29deg));
+          color: #413631; font-size: 13px;
+        }
         .piece-square { background: #69c9ad; color: #155945; font-size: 16px; }
         .piece-distractor-square { background: #d7a3d8; color: #563458; font-size: 16px; }
         .tray { min-height: 150px; padding: 12px; border-radius: 12px; background: #f7f8fc; border: 1px solid #edf0f6; }
@@ -353,7 +358,7 @@ components.html(
 
           function setupProblem() {
             problem = problems[problemIndex];
-            document.documentElement.style.setProperty("--rectangle-color-shift", `${problemIndex * 31}deg`);
+            document.documentElement.style.setProperty("--rectangle-color-hue", `${35 + problemIndex * 31}deg`);
             const a = problem.coefficient;
             const rightSide = problem.rightSide;
             problemExpression.textContent = `x² + ${2 * a}x = ${rightSide}`;
