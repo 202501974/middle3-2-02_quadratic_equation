@@ -150,7 +150,7 @@ components.html(
               </div>
             </div>
             <div class="tray">
-              <div class="tray-title"><span>도형 조각</span><span>조각을 골라 퍼즐 판에 놓아 보세요.</span></div>
+              <div class="tray-title"><span>도형 조각</span></div>
               <div class="tray-pieces" id="tray"></div>
               <p class="tray-feedback" id="trayFeedback" aria-live="polite"></p>
             </div>
