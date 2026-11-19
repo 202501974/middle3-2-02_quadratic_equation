@@ -153,7 +153,6 @@ components.html(
         <p class="intro">도형을 옮겨 큰 정사각형을 만들어 보세요. 조각을 놓을 때마다 넓이의 식이 바뀝니다.</p>
         <section class="problem-card" aria-label="오늘의 문제">
           <div><div class="problem-label">오늘의 문제</div><div class="problem-expression">x² + 10x = 24</div></div>
-          <div class="problem-hint">빈 모서리를 넓이가 25인 정사각형으로 채워 완전제곱식을 만들어 보세요.</div>
         </section>
 
         <div class="layout">
