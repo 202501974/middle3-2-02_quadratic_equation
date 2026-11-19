@@ -316,35 +316,6 @@ components.html(
             return { width: side * unit, height: side * unit };
           }
 
-          function validPlacement(piece, x, y) {
-            const { width, height } = dimensions(piece);
-            if (x < 0 || y < 0 || x + width > 12 * unit || y + height > 12 * unit) return false;
-            const occupied = new Set();
-            for (const other of pieces) {
-              if (other === piece || !other.placed) continue;
-              for (const cell of cellsFor(other, other.x, other.y)) occupied.add(cell);
-            }
-            return cellsFor(piece, x, y).every(cell => !occupied.has(cell));
-          }
-
-          function nearestValidPlacement(piece, targetX, targetY) {
-            if (validPlacement(piece, targetX, targetY)) return { x: targetX, y: targetY };
-            const { width, height } = dimensions(piece);
-            let nearest = null;
-            let nearestDistance = Infinity;
-            for (let y = 0; y + height <= 12 * unit; y += unit) {
-              for (let x = 0; x + width <= 12 * unit; x += unit) {
-                if (!validPlacement(piece, x, y)) continue;
-                const distance = (x - targetX) ** 2 + (y - targetY) ** 2;
-                if (distance < nearestDistance) {
-                  nearest = { x, y };
-                  nearestDistance = distance;
-                }
-              }
-            }
-            return nearest;
-          }
-
           function setPosition(piece, x, y) {
             piece.el.style.left = `${x}px`;
             piece.el.style.top = `${y}px`;
@@ -435,18 +406,9 @@ components.html(
             const horizontalPosition = (event.clientX - rect.left) / rect.width;
             const verticalPosition = (event.clientY - rect.top) / rect.height;
             const pieceSize = dimensions(model);
-            const targetX = Math.round(((event.clientX - boardRect.left) / scale - horizontalPosition * pieceSize.width) / unit) * unit;
-            const targetY = Math.round(((event.clientY - boardRect.top) / scale - verticalPosition * pieceSize.height) / unit) * unit;
-            const initialPosition = nearestValidPlacement(model, targetX, targetY);
-            if (!initialPosition) {
-              if (!wasPlaced) {
-                piece.style.cssText = "";
-                tray.appendChild(piece);
-              }
-              choose(null);
-              return;
-            }
-            setPosition(model, initialPosition.x, initialPosition.y);
+            const x = (event.clientX - boardRect.left) / scale - horizontalPosition * pieceSize.width;
+            const y = (event.clientY - boardRect.top) / scale - verticalPosition * pieceSize.height;
+            setPosition(model, x, y);
             piece.classList.add("dragging");
             drag = {
               model, wasPlaced, scale,
@@ -461,8 +423,7 @@ components.html(
             const boardRect = board.getBoundingClientRect();
             const targetX = Math.round(((event.clientX - boardRect.left) / drag.scale - drag.offsetX) / unit) * unit;
             const targetY = Math.round(((event.clientY - boardRect.top) / drag.scale - drag.offsetY) / unit) * unit;
-            const position = nearestValidPlacement(drag.model, targetX, targetY);
-            if (position) setPosition(drag.model, position.x, position.y);
+            setPosition(drag.model, targetX, targetY);
           }
 
           function endDrag(event) {
@@ -484,8 +445,10 @@ components.html(
             }
             const x = Math.round((Number.parseFloat(model.el.style.left) || 0) / unit) * unit;
             const y = Math.round((Number.parseFloat(model.el.style.top) || 0) / unit) * unit;
+            const { width, height } = dimensions(model);
+            const withinBoard = x >= 0 && y >= 0 && x + width <= 12 * unit && y + height <= 12 * unit;
             model.el.classList.remove("dragging");
-            if (validPlacement(model, x, y)) {
+            if (withinBoard) {
               model.x = x;
               model.y = y;
               model.placed = true;
