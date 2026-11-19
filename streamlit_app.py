@@ -70,8 +70,24 @@ components.html(
         .piece.dragging { opacity: .88; box-shadow: none; z-index: 10; }
         .board .piece.dragging { z-index: 20; }
         .piece-x2 { background: #7d8df1; color: white; font-size: 20px; }
-        .piece-x-horizontal, .piece-x-vertical { background: #ffbf66; color: #653e08; font-size: 14px; }
+        .piece-x-horizontal, .piece-x-vertical, .piece-distractor-rect {
+          animation: rectangle-color-cycle 6s linear infinite;
+        }
+        .piece-x-horizontal { background: #ffbf66; color: #653e08; font-size: 14px; }
+        .piece-x-vertical { background: #8ec9e8; color: #184d67; font-size: 14px; }
         .piece-distractor-rect { background: #e58b82; color: #642f2a; font-size: 13px; }
+        .piece-rectangle-1 { animation-delay: -1s; }
+        .piece-rectangle-2 { animation-delay: -2s; }
+        .piece-rectangle-3 { animation-delay: -3s; }
+        .piece-rectangle-4 { animation-delay: -4s; }
+        .piece-rectangle-5 { animation-delay: -5s; }
+        @keyframes rectangle-color-cycle {
+          from { filter: hue-rotate(0deg); }
+          to { filter: hue-rotate(360deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .piece-x-horizontal, .piece-x-vertical, .piece-distractor-rect { animation: none; }
+        }
         .piece-square { background: #69c9ad; color: #155945; font-size: 16px; }
         .piece-distractor-square { background: #d7a3d8; color: #563458; font-size: 16px; }
         .tray { min-height: 150px; padding: 12px; border-radius: 12px; background: #f7f8fc; border: 1px solid #edf0f6; }
@@ -244,6 +260,12 @@ components.html(
             piece.setAttribute("role", "button");
             piece.setAttribute("aria-label", description);
             piece.tabIndex = 0;
+            if (type === "x-horizontal" || type === "x-vertical" || type === "distractor-rect") {
+              const rectangleIndex = pieces.filter(({ type: pieceType }) =>
+                pieceType === "x-horizontal" || pieceType === "x-vertical" || pieceType === "distractor-rect"
+              ).length;
+              piece.classList.add(`piece-rectangle-${rectangleIndex}`);
+            }
             setPieceSize(piece, columns, rows);
             tray.appendChild(piece);
             pieces.push({ el: piece, type, id, columns, rows, required, term, placed: false, x: 0, y: 0 });
