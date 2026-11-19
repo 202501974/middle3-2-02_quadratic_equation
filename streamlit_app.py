@@ -104,7 +104,7 @@ components.html(
         .expression { min-height: 39px; margin-top: 6px; color: #fff; font-size: clamp(22px, 3vw, 29px); font-weight: 800; letter-spacing: -.7px; overflow-wrap: anywhere; }
         .expression.empty { color: #bdc7df; font-size: 17px; font-weight: 600; letter-spacing: 0; }
         .expression .term-x2 { color: #b7c1ff; }
-        .expression .term-x { color: #ffd18e; }
+        .expression .term-x { color: #fff; }
         .expression .term-unit { color: #8fe1c7; }
         .expression .term-distractor { color: #ffaaaa; }
         .expression.result { min-height: 28px; font-size: 17px; color: #d7ddff; }
@@ -264,6 +264,13 @@ components.html(
             piece.style.setProperty("--piece-height", `${rows * unit}px`);
           }
 
+          function shuffle(items) {
+            for (let index = items.length - 1; index > 0; index--) {
+              const randomIndex = Math.floor(Math.random() * (index + 1));
+              [items[index], items[randomIndex]] = [items[randomIndex], items[index]];
+            }
+          }
+
           function buildPieces() {
             const a = problem.coefficient;
             const wrongCoefficients = [a - 1, a + 1];
@@ -301,10 +308,7 @@ components.html(
                 term: `${side * side}`
               });
             }
-            for (let index = pieces.length - 1; index > 0; index--) {
-              const randomIndex = Math.floor(Math.random() * (index + 1));
-              [pieces[index], pieces[randomIndex]] = [pieces[randomIndex], pieces[index]];
-            }
+            shuffle(pieces);
             for (const piece of pieces) tray.appendChild(piece.el);
             problemExpression.textContent = `x² + ${2 * a}x = ${problem.rightSide}`;
             problemLabel.textContent = problemIndex === 0 ? "오늘의 문제" : `도전 문제 ${problemIndex} / ${problems.length - 1}`;
@@ -326,6 +330,7 @@ components.html(
               { value: "root-pair", label: `x = ${-a - root - 1} 또는 x = ${-a + root + 1}` },
               { value: "second-only", label: `x = ${secondRoot}만` }
             ];
+            shuffle(options);
             choices.replaceChildren();
             for (const option of options) {
               const label = document.createElement("label");
@@ -432,8 +437,7 @@ components.html(
             if (x2Placed) terms.push('<span class="term-x2">x²</span>');
             const xCoefficient = rectangleCount * problem.coefficient + distractorX;
             if (xCoefficient) {
-              const termClass = distractorX ? "term-distractor" : "term-x";
-              terms.push(`<span class="${termClass}">${xCoefficient}x</span>`);
+              terms.push(`<span class="term-x">${xCoefficient}x</span>`);
             }
             const constant = (squarePlaced ? problem.coefficient ** 2 : 0) + distractorConstant;
             if (constant) {
