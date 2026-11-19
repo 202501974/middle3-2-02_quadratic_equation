@@ -273,8 +273,15 @@ components.html(
 
           function buildPieces() {
             const a = problem.coefficient;
-            const wrongCoefficients = [a - 1, a + 1];
-            const wrongSquares = [a - 1, a + 1];
+            const distractorSizes = [];
+            for (let distance = 1; distractorSizes.length < 2; distance++) {
+              for (const size of [a - distance, a + distance]) {
+                if (size > 0 && size !== 3) distractorSizes.push(size);
+                if (distractorSizes.length === 2) break;
+              }
+            }
+            const wrongCoefficients = distractorSizes;
+            const wrongSquares = distractorSizes;
             pieces.length = 0;
             tray.replaceChildren();
             board.replaceChildren();
